@@ -1,6 +1,7 @@
 #ifndef WMWINDOW_H
 #define WMWINDOW_H
 
+#include <string>
 #include <X11/Xlib.h>
 
 class WmWindow {
@@ -13,6 +14,8 @@ public:
 
     void show();
     void hide();
+    bool supportsProtocol(const std::string& protocol) throw ();
+    bool close();
 };
 
 #endif // WMWINDOW_H

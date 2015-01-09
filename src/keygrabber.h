@@ -14,6 +14,8 @@ public:
     int defaultModifier();
     int keyWorkspace1();
     int keyWorkspace2();
+    int keyClose();
+    int keyDMenu();
 };
 
 #endif // KEYGRABBER_H

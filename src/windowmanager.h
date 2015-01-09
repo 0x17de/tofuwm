@@ -2,11 +2,13 @@
 #define WINDOWMANAGER_H
 
 #include <list>
+#include <map>
 #include <memory>
 #include <X11/Xlib.h>
 #include "keygrabber.h"
 #include "workspace.h"
 #include "wmwindow.h"
+#include "fonthelper.h"
 
 struct Geometry {
     int x, y, w, h;
@@ -15,6 +17,7 @@ struct Geometry {
 class WindowManager {
 private:
     bool running = true;
+    std::list<std::string> debugStrings;
 
     // Viewport
     Geometry desktop; // For using docks, blocked areas
@@ -32,7 +35,10 @@ private:
 
     std::shared_ptr<Display> displayPtr;
     Window root;
+    Window currentWindow = 0; // @TODO: make to WmWindow?
+    std::map<Window, std::shared_ptr<WmWindow>> windows;
     KeyGrabber keyGrabber;
+    FontHelper fontHelper;
 
     // Workspaces
     Workspace workspaces[2];
@@ -43,7 +49,13 @@ private:
     void changeWorkspace(int number);
     void loop();
     void calculateDesktopSpace();
+    void spawn(const std::string& cmd, char *const argv[]);
 
+    // === Debug
+    void printDebugText();
+    void addDebugText(const std::string& text);
+
+    // === Events & Notifications
     void onMotion();
     void onEnter();
     void onLeave();
@@ -54,6 +66,14 @@ private:
     void onConfigureRequest();
     void onCirculateRequest();
     void onMapRequest();
+
+    void onCirculateNotify();
+    void onConfigureNotify();
+    void onDestroyNotify();
+    void onGravityNotify();
+    void onMapNotify();
+    void onReparentNotify();
+    void onUnmapNotify();
 
 public:
     WindowManager();

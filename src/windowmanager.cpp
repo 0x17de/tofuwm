@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cassert>
 #include <X11/Xlib.h>
+#include <unistd.h>
 
 #include "windowmanager.h"
 #include "display.h"
@@ -12,11 +13,13 @@ using namespace std;
 WindowManager::WindowManager() :
     displayPtr(XOpenDisplay(0), Free_XCloseDisplay()),
     keyGrabber(displayPtr.get()),
-    root(DefaultRootWindow(displayPtr.get()))
+    root(DefaultRootWindow(displayPtr.get())),
+    fontHelper(displayPtr.get())
 {
     assert((bool)displayPtr);
     XSelectInput(displayPtr.get(), root,
             SubstructureRedirectMask
+            | StructureNotifyMask
             | EnterWindowMask
             | LeaveWindowMask
     );
@@ -34,7 +37,7 @@ void WindowManager::initBackground() {
     int r = rand() % 255;
     int g = rand() % 255;
     int b = rand() % 255;
-    XSetWindowBackground(display, root, 0 + r << 16 + g << 8 + b);
+    XSetWindowBackground(display, root, 0xc0c0c0);
     XClearWindow(display, root);
     XFlush(display);
 }
@@ -45,11 +48,13 @@ void WindowManager::run() {
 }
 
 void WindowManager::changeWorkspace(int number) {
+    currentWindow = 0;
     if (currentWorkspace == &workspaces[number])
         return; // same workspace
     currentWorkspace->hide();
     currentWorkspace = &workspaces[number];
     currentWorkspace->show();
+    // @TODO: Select currentWindow by mouse position
 }
 
 void WindowManager::calculateDesktopSpace() {
@@ -85,9 +90,38 @@ void WindowManager::calculateDesktopSpace() {
     }
 }
 
+void WindowManager::addDebugText(const std::string& text) {
+    debugStrings.push_front(text);
+    if (debugStrings.size() > 30)
+        debugStrings.pop_back();
+}
+
+void WindowManager::printDebugText() {
+    GC gc = XDefaultGC(displayPtr.get(), XDefaultScreen(displayPtr.get()));
+    fontHelper.setFont(gc);
+
+    XClearWindow(displayPtr.get(), root);
+
+    int y = 40;
+    for (string &text : debugStrings) {
+        XDrawString(displayPtr.get(), root, gc, 20, y, text.c_str(), text.length());
+        y += 16;
+    }
+}
+
+void WindowManager::spawn(const std::string& cmd, char *const argv[]) {
+    addDebugText(cmd);
+    pid_t pid = fork();
+    if (pid == 0) {
+        execv(cmd.c_str(), argv);
+        exit(0);
+    }
+}
+
 void WindowManager::loop() {
     Display *display = displayPtr.get();
     // Loop
+    printDebugText();
     while(running) {
         XNextEvent(display, &event);
         if (event.type == MapRequest) {
@@ -109,5 +143,6 @@ void WindowManager::loop() {
         } else if (event.type == ButtonRelease) {
             onButtonRelease();
         }
+        printDebugText();
     }
 }

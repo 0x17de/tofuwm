@@ -1,7 +1,6 @@
 #include <cmath>
 #include <X11/Xlib.h>
 #include "windowmanager.h"
-#include "wmwindow.h"
 
 
 using namespace std;
@@ -10,13 +9,37 @@ using namespace std;
 void WindowManager::onMapRequest() {
     shared_ptr <WmWindow> w(make_shared<WmWindow>(displayPtr.get(), event.xmaprequest.window));
     currentWorkspace->addWindow(w);
+    windows.insert(make_pair(event.xmaprequest.window, w));
+    if (currentWindow == 0)
+        currentWindow = w.get()->window;
 }
 
 void WindowManager::onKeyPress() {
-    if (event.xkey.keycode == keyGrabber.keyWorkspace1())
-    changeWorkspace(0);
-    else if (event.xkey.keycode == keyGrabber.keyWorkspace2())
-    changeWorkspace(1);
+    if (event.xkey.state & Mod4Mask) {
+        if (event.xkey.state & ShiftMask) {
+            if (event.xkey.keycode == keyGrabber.keyClose()) {
+                addDebugText("WINDOW CLOSE");
+                if (currentWindow != 0) {
+                    auto it = windows.find(currentWindow);
+                    if (it != windows.end())
+                        it->second->close();
+                }
+                currentWindow = 0; // @TODO: Select next window by mouse position
+            }
+        } else {
+            if (event.xkey.keycode == keyGrabber.keyWorkspace1()) {
+                addDebugText("WORKSPACE 1");
+                changeWorkspace(0);
+            } else if (event.xkey.keycode == keyGrabber.keyWorkspace2()) {
+                addDebugText("WORKSPACE 0");
+                changeWorkspace(1);
+            } else if (event.xkey.keycode == keyGrabber.keyDMenu()) {
+                addDebugText("DMENU SPAWN");
+                char *const parmList[] = {(char *) "dmenu_run", 0};
+                spawn("/usr/bin/dmenu_run", parmList);
+            }
+        }
+    }
 
     // @TODO: raise windows
     /* if (event.xkey.subwindow != None) {
@@ -44,9 +67,11 @@ void WindowManager::onButtonRelease() {
 }
 
 void WindowManager::onEnter() {
+    currentWindow = event.xcrossing.window;
 }
 
 void WindowManager::onLeave() {
+    currentWindow = event.xcrossing.window;
 }
 
 void WindowManager::onMotion() {
