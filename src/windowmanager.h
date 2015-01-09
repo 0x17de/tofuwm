@@ -11,8 +11,11 @@ private:
     bool running = true;
 
     // Move window
-    XButtonEvent start = {0};
+    XButtonEvent moveWindowStart = {0};
     XWindowAttributes attributes = {0};
+    // Resize window
+    bool moveWindowExpandXPositive;
+    bool moveWindowExpandYPositive;
 
     // Default
     XEvent event;

@@ -31,12 +31,16 @@ void WindowManager::onKeyRelease() {
 void WindowManager::onButtonPress() {
     if (event.xbutton.subwindow != None) {
         XGetWindowAttributes(displayPtr.get(), event.xbutton.subwindow, &attributes);
-        start = event.xbutton;
+        moveWindowStart = event.xbutton;
+        if (moveWindowStart.button == 3) { // Right mouse
+            moveWindowExpandXPositive = moveWindowStart.x_root >= attributes.x + attributes.width / 2;
+            moveWindowExpandYPositive = moveWindowStart.y_root >= attributes.y + attributes.height / 2;
+        }
     }
 }
 
 void WindowManager::onButtonRelease() {
-    start.subwindow = None;
+    moveWindowStart.subwindow = None;
 }
 
 void WindowManager::onEnter() {
@@ -46,14 +50,18 @@ void WindowManager::onLeave() {
 }
 
 void WindowManager::onMotion() {
-    if (start.subwindow != None) {
-        int xdiff = event.xbutton.x_root - start.x_root;
-        int ydiff = event.xbutton.y_root - start.y_root;
-        XMoveResizeWindow(displayPtr.get(), start.subwindow,
-                attributes.x + (start.button == 1 ? xdiff : 0),
-                attributes.y + (start.button == 1 ? ydiff : 0),
-                max(1, attributes.width + (start.button == 3 ? xdiff : 0)),
-                max(1, attributes.height + (start.button == 3 ? ydiff : 0)));
+    if (moveWindowStart.subwindow != None) {
+        int xdiff = event.xbutton.x_root - moveWindowStart.x_root;
+        int ydiff = event.xbutton.y_root - moveWindowStart.y_root;
+        if (moveWindowStart.button == 1) { // Left mouse
+            XMoveResizeWindow(displayPtr.get(), moveWindowStart.subwindow,
+                    attributes.x + xdiff, attributes.y + ydiff,
+                    max(1, attributes.width), max(1, attributes.height));
+        } else if (moveWindowStart.button == 3) { // Right mouse
+            XMoveResizeWindow(displayPtr.get(), moveWindowStart.subwindow,
+                    attributes.x + (moveWindowExpandXPositive ? 0 : xdiff), attributes.y + (moveWindowExpandYPositive ? 0 : ydiff),
+                    max(1, attributes.width + (moveWindowExpandXPositive ? xdiff : -xdiff)), max(1, attributes.height + (moveWindowExpandYPositive ? ydiff : -ydiff)));
+        }
     }
 }
 
