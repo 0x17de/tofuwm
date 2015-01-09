@@ -9,6 +9,8 @@ using namespace std;
 void WindowManager::onMapRequest() {
     shared_ptr <WmWindow> w(make_shared<WmWindow>(displayPtr.get(), event.xmaprequest.window));
     currentWorkspace->addWindow(w);
+    w->setDefaultEventMask();
+
     windows.insert(make_pair(event.xmaprequest.window, w));
     if (currentWindow == 0)
         currentWindow = w.get()->window;
@@ -67,11 +69,11 @@ void WindowManager::onButtonRelease() {
 }
 
 void WindowManager::onEnter() {
-    currentWindow = event.xcrossing.window;
+    setCurrentWindow(event.xcrossing.window);
 }
 
 void WindowManager::onLeave() {
-    currentWindow = event.xcrossing.window;
+    setCurrentWindow(0);
 }
 
 void WindowManager::onMotion() {

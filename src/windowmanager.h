@@ -50,6 +50,7 @@ private:
     void loop();
     void calculateDesktopSpace();
     void spawn(const std::string& cmd, char *const argv[]);
+    void setCurrentWindow(Window window);
 
     // === Debug
     void printDebugText();

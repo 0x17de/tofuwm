@@ -14,8 +14,11 @@ public:
 
     void show();
     void hide();
+    Atom getAtom(const std::string& protocol);
     bool supportsProtocol(const std::string& protocol) throw ();
-    bool close();
+    bool supportsProtocol(Atom protocol) throw ();
+    void close();
+    void setDefaultEventMask();
 };
 
 #endif // WMWINDOW_H

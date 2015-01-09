@@ -18,17 +18,25 @@ void WmWindow::show() {
     XMapWindow(display, window);
 }
 
+Atom WmWindow::getAtom(const std::string& protocol) {
+    return XInternAtom(display, protocol.c_str(), false);
+}
+
 bool WmWindow::supportsProtocol(const std::string& protocol) throw () {
+    Atom wm_delete_window = XInternAtom(display, protocol.c_str(), false);
+    return supportsProtocol(wm_delete_window);
+}
+
+bool WmWindow::supportsProtocol(Atom protocol) throw () {
     bool found = false;
 
     int numberOfProtocols;
     Atom* protocols;
 
-    Atom wm_delete_window = XInternAtom(display, protocol.c_str(), False);
     XGetWMProtocols(display, window, &protocols, &numberOfProtocols);
 
     for (int i = 0; i < numberOfProtocols; ++i) {
-        if (protocols[i] == wm_delete_window) {
+        if (protocols[i] == protocol) {
             found = true;
             break;
         }
@@ -39,10 +47,28 @@ bool WmWindow::supportsProtocol(const std::string& protocol) throw () {
     return found;
 }
 
-bool WmWindow::close() {
-    if (!supportsProtocol("WM_DELETE_WINDOW"))
-        return false;
+void WmWindow::close() {
+    Atom wm_delete_window = getAtom("WM_DELETE_WINDOW");
 
-    XDestroyWindow(display, window);
-    return true;
+    if (!supportsProtocol(wm_delete_window)) {
+        XDestroyWindow(display, window);
+        return;
+    }
+
+    Atom wm_protocols = getAtom("WM_PROTOCOLS");
+
+    XClientMessageEvent xevent;
+    xevent.type = ClientMessage;
+    xevent.window = window;
+    xevent.message_type = wm_protocols;
+    xevent.format = 32;
+    xevent.data.l[0] = wm_delete_window;
+    xevent.data.l[1] = CurrentTime;
+    XSendEvent(display, window, false, 0, (XEvent *)&xevent);
+}
+
+void WmWindow::setDefaultEventMask() {
+    XSetWindowAttributes attributes;
+    attributes.event_mask = EnterWindowMask | LeaveWindowMask;
+    XChangeWindowAttributes(display, window, CWEventMask, &attributes);
 }

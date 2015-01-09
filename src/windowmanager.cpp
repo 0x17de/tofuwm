@@ -2,6 +2,7 @@
 #include <cassert>
 #include <X11/Xlib.h>
 #include <unistd.h>
+#include <sstream>
 
 #include "windowmanager.h"
 #include "display.h"
@@ -20,8 +21,6 @@ WindowManager::WindowManager() :
     XSelectInput(displayPtr.get(), root,
             SubstructureRedirectMask
             | StructureNotifyMask
-            | EnterWindowMask
-            | LeaveWindowMask
     );
     currentWorkspace = &workspaces[0];
 }
@@ -33,24 +32,30 @@ WindowManager::~WindowManager() {
 void WindowManager::initBackground() {
     Display *display = displayPtr.get();
 
-    srand(time(0));
-    int r = rand() % 255;
-    int g = rand() % 255;
-    int b = rand() % 255;
     XSetWindowBackground(display, root, 0xc0c0c0);
     XClearWindow(display, root);
     XFlush(display);
 }
 
 void WindowManager::run() {
+    // @TODO: Scan and add initially existing windows. Then set default event mask.
     initBackground();
     loop();
+}
+
+void WindowManager::setCurrentWindow(Window window) {
+    currentWindow = window;
+
+    stringstream ss;
+    ss << "CURRENT WINDOW 0x" << hex << currentWindow;
+    addDebugText(ss.str());
 }
 
 void WindowManager::changeWorkspace(int number) {
     currentWindow = 0;
     if (currentWorkspace == &workspaces[number])
         return; // same workspace
+
     currentWorkspace->hide();
     currentWorkspace = &workspaces[number];
     currentWorkspace->show();
