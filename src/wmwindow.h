@@ -3,11 +3,11 @@
 
 #include <X11/Xlib.h>
 
-struct WmWindow {
+class WmWindow {
+public:
     Display* display;
     Window window;
 
-public:
     WmWindow(Display* display, Window window);
     ~WmWindow();
 

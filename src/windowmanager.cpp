@@ -52,6 +52,39 @@ void WindowManager::changeWorkspace(int number) {
     currentWorkspace->show();
 }
 
+void WindowManager::calculateDesktopSpace() {
+    XWindowAttributes rAttr;
+    XGetWindowAttributes(displayPtr.get(), root, &rAttr);
+
+    Geometry& d = desktop;
+    d.x = rAttr.x;
+    d.y = rAttr.x;
+    d.w = rAttr.width;
+    d.h = rAttr.height;
+
+    for (shared_ptr<WmWindow>& w : dockedWindows) {
+        XWindowAttributes wAttr;
+        XGetWindowAttributes(displayPtr.get(), w->window, &wAttr);
+
+        if (wAttr.x == 0 && wAttr.width < rAttr.width
+         && wAttr.width > d.x) {
+            d.x = wAttr.width;
+        }
+        if (wAttr.y == 0 && wAttr.height < rAttr.height
+         && wAttr.height > d.y) {
+            d.y = wAttr.height;
+        }
+        if (wAttr.x + wAttr.width == rAttr.width
+                && wAttr.x < d.w) {
+            d.w = wAttr.x;
+        }
+        if (wAttr.y + wAttr.height == rAttr.height
+                && wAttr.y < d.h) {
+            d.h = wAttr.y;
+        }
+    }
+}
+
 void WindowManager::loop() {
     Display *display = displayPtr.get();
     // Loop
