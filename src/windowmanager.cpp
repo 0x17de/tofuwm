@@ -1,9 +1,7 @@
 #include <iostream>
 #include <cassert>
-#include <cmath>
 #include <X11/Xlib.h>
 
-#include "wmwindow.h"
 #include "windowmanager.h"
 #include "display.h"
 
@@ -17,7 +15,11 @@ WindowManager::WindowManager() :
     root(DefaultRootWindow(displayPtr.get()))
 {
     assert((bool)displayPtr);
-    XSelectInput(displayPtr.get(), root, SubstructureRedirectMask);
+    XSelectInput(displayPtr.get(), root,
+            SubstructureRedirectMask
+            | EnterWindowMask
+            | LeaveWindowMask
+    );
     currentWorkspace = &workspaces[0];
 }
 
@@ -56,36 +58,23 @@ void WindowManager::loop() {
     while(running) {
         XNextEvent(display, &event);
         if (event.type == MapRequest) {
-            shared_ptr<WmWindow> w(make_shared<WmWindow>(display, event.xmaprequest.window));
-            currentWorkspace->addWindow(w);
+            onMapRequest();
+        } else if (event.type == EnterNotify) {
+            onEnter();
+        } else if (event.type == LeaveNotify) {
+            onLeave();
+        } else if (event.type == ConfigureRequest) {
+            onConfigureRequest();
+        } else if (event.type == CirculateRequest) {
+            onCirculateRequest();
         } else if (event.type == KeyPress) {
-            if (event.xkey.keycode == keyGrabber.keyWorkspace1())
-                changeWorkspace(0);
-            else if (event.xkey.keycode == keyGrabber.keyWorkspace2())
-                changeWorkspace(1);
-
-            // @TODO: raise windows
-            /* if (event.xkey.subwindow != None) {
-                XRaiseWindow(display, event.xkey.subwindow);
-                cout << "Raise" << endl;
-            } */
+            onKeyPress();
         } else if (event.type == ButtonPress) {
-            if (event.xbutton.subwindow != None) {
-                XGetWindowAttributes(display, event.xbutton.subwindow, &attributes);
-                start = event.xbutton;
-            }
+            onButtonPress();
         } else if (event.type == MotionNotify) {
-            if (start.subwindow != None) {
-                int xdiff = event.xbutton.x_root - start.x_root;
-                int ydiff = event.xbutton.y_root - start.y_root;
-                XMoveResizeWindow(display, start.subwindow,
-                        attributes.x + (start.button == 1 ? xdiff : 0),
-                        attributes.y + (start.button == 1 ? ydiff : 0),
-                        max(1, attributes.width + (start.button == 3 ? xdiff : 0)),
-                        max(1, attributes.height + (start.button == 3 ? ydiff : 0)));
-            }
+            onMotion();
         } else if (event.type == ButtonRelease) {
-            start.subwindow = None;
+            onButtonRelease();
         }
     }
 }

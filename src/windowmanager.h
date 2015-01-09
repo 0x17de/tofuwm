@@ -30,6 +30,17 @@ private:
     void changeWorkspace(int number);
     void loop();
 
+    void onMotion();
+    void onEnter();
+    void onLeave();
+    void onKeyPress();
+    void onKeyRelease();
+    void onButtonPress();
+    void onButtonRelease();
+    void onConfigureRequest();
+    void onCirculateRequest();
+    void onMapRequest();
+
 public:
     WindowManager();
     ~WindowManager();

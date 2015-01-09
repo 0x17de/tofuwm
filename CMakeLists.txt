@@ -9,7 +9,7 @@ find_package(X11 REQUIRED)
 set(SOURCE_FILES
     src/main.cpp
     src/keygrabber.cpp src/keygrabber.h
-    src/windowmanager.cpp src/windowmanager.h
+    src/windowmanager.cpp src/windowmanager_on.cpp src/windowmanager.h
     src/display.h
     src/wmwindow.cpp src/wmwindow.h
     src/workspace.cpp src/workspace.h)
