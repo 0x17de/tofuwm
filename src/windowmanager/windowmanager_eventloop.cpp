@@ -73,6 +73,9 @@ void WindowManager::loop() {
             case UnmapNotify:
                 addDebugText("EVENT UnmapNotify");
                 onUnmapNotify(); break;
+            case ClientMessage:
+                addDebugText("EVENT ClientMessage");
+                onClientMessage(); break;
         }
         printDebugText();
     }
