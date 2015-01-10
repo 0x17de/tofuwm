@@ -18,10 +18,7 @@ WindowManager::WindowManager() :
     fontHelper(displayPtr.get())
 {
     assert((bool)displayPtr);
-    XSelectInput(displayPtr.get(), root,
-            SubstructureRedirectMask
-            | StructureNotifyMask
-    );
+    XSelectInput(displayPtr.get(), root, SubstructureRedirectMask);
     currentWorkspace = &workspaces[0];
 }
 
@@ -44,11 +41,7 @@ void WindowManager::run() {
 }
 
 void WindowManager::setCurrentWindow(Window window) {
-    auto it = windows.find(window);
-    if (it == windows.end())
-        return;
-    currentWindow = it->second.get();
-
+    currentWindow = findWindow(window);
     stringstream ss;
     ss << "CURRENT WINDOW 0x" << hex << currentWindow;
     addDebugText(ss.str());
@@ -124,6 +117,15 @@ void WindowManager::spawn(const std::string& cmd, char *const argv[]) {
         execv(cmd.c_str(), argv);
         exit(0);
     }
+}
+
+WmWindow* WindowManager::findWindow(Window window) {
+    cout << "TryFind " << hex << window << endl;
+    auto it = windows.find(window);
+    if (it == windows.end())
+        return 0;
+    cout << "Found " << endl;
+    return it->second.get();
 }
 
 void WindowManager::loop() {

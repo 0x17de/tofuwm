@@ -1,3 +1,4 @@
+#include <iostream>
 #include <cmath>
 #include <X11/Xlib.h>
 #include "windowmanager.h"
@@ -8,10 +9,13 @@ using namespace std;
 
 void WindowManager::onMapRequest() {
     shared_ptr <WmWindow> w(make_shared<WmWindow>(displayPtr.get(), root, event.xmaprequest.window));
-    windows.insert(make_pair(event.xmaprequest.window, w));
+    windows.insert(make_pair(w->window, w));
+    windows.insert(make_pair(w->frame, w));
+
     w->setWorkspace(currentWorkspace);
     currentWorkspace->addWindow(w.get());
     w->setDefaultEventMask();
+
     XMapWindow(displayPtr.get(), w->window);
     w->show();
 
@@ -49,10 +53,15 @@ void WindowManager::onKeyRelease() {
 
 void WindowManager::onButtonPress() {
     if (event.xbutton.state & keyGrabber.defaultModifier()) {
-        if (event.xbutton.subwindow != None) {
-            XGetWindowAttributes(displayPtr.get(), event.xbutton.subwindow, &moveWindowAttributes);
+        if (event.xbutton.subwindow) {
+            moveWindow = findWindow(event.xbutton.subwindow);
+            if (!moveWindow)
+                return;
+            currentWindow = moveWindow;
+            currentWindow->setActive(true);
+            XGetWindowAttributes(displayPtr.get(), moveWindow->frame, &moveWindowAttributes);
             moveWindowStart = event.xbutton;
-            XRaiseWindow(displayPtr.get(), event.xbutton.subwindow);
+            XRaiseWindow(displayPtr.get(), moveWindow->frame);
             if (moveWindowStart.button == 3) { // Right mouse
                 moveWindowExpandXPositive = moveWindowStart.x_root >= moveWindowAttributes.x + moveWindowAttributes.width / 2;
                 moveWindowExpandYPositive = moveWindowStart.y_root >= moveWindowAttributes.y + moveWindowAttributes.height / 2;
@@ -63,9 +72,12 @@ void WindowManager::onButtonPress() {
 
 void WindowManager::onButtonRelease() {
     moveWindowStart.subwindow = None;
+    moveWindow = 0;
 }
 
 void WindowManager::onEnter() {
+    cout << "ENTER WIN " << hex << event.xcrossing.window << endl;
+    cout << "ENTER SUB " << hex << event.xcrossing.subwindow << endl;
     setCurrentWindow(event.xcrossing.window);
     currentWindow->setActive(true);
 }
@@ -80,17 +92,14 @@ void WindowManager::onLeave() {
 
 void WindowManager::onMotion() {
     if (event.xbutton.state & keyGrabber.defaultModifier()) {
-        if (moveWindowStart.subwindow != None) {
+        if (moveWindow) {
             int xdiff = event.xbutton.x_root - moveWindowStart.x_root;
             int ydiff = event.xbutton.y_root - moveWindowStart.y_root;
             if (moveWindowStart.button == 1) { // Left mouse
-                XMoveResizeWindow(displayPtr.get(), moveWindowStart.subwindow,
-                        moveWindowAttributes.x + xdiff, moveWindowAttributes.y + ydiff,
-                        max(1, moveWindowAttributes.width), max(1, moveWindowAttributes.height));
+                moveWindow->relocate(moveWindowAttributes.x + xdiff, moveWindowAttributes.y + ydiff, moveWindowAttributes.width, moveWindowAttributes.height);
             } else if (moveWindowStart.button == 3) { // Right mouse
-                XMoveResizeWindow(displayPtr.get(), moveWindowStart.subwindow,
-                        moveWindowAttributes.x + (moveWindowExpandXPositive ? 0 : xdiff), moveWindowAttributes.y + (moveWindowExpandYPositive ? 0 : ydiff),
-                        max(1, moveWindowAttributes.width + (moveWindowExpandXPositive ? xdiff : -xdiff)), max(1, moveWindowAttributes.height + (moveWindowExpandYPositive ? ydiff : -ydiff)));
+                moveWindow->relocate(moveWindowAttributes.x + (moveWindowExpandXPositive ? 0 : xdiff), moveWindowAttributes.y + (moveWindowExpandYPositive ? 0 : ydiff),
+                    moveWindowAttributes.width + (moveWindowExpandXPositive ? xdiff : -xdiff), moveWindowAttributes.height + (moveWindowExpandYPositive ? ydiff : -ydiff));
             }
         }
     }

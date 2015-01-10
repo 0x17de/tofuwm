@@ -16,7 +16,9 @@ void WindowManager::onDestroyNotify() {
 
     auto it = windows.find(event.xdestroywindow.window);
     it->second->window = 0; // as it is already destroyed
+    auto it2 = windows.find(it->second->frame);
     windows.erase(it);
+    windows.erase(it2);
 
     if (newCurrentWindow)
         currentWindow = 0;

@@ -24,6 +24,7 @@ private:
     std::list<std::shared_ptr<WmWindow>> dockedWindows;
 
     // Move window
+    WmWindow* moveWindow = 0;
     XButtonEvent moveWindowStart = {0};
     XWindowAttributes moveWindowAttributes = {0};
     // Resize window
@@ -51,6 +52,7 @@ private:
     void calculateDesktopSpace();
     void spawn(const std::string& cmd, char *const argv[]);
     void setCurrentWindow(Window window);
+    WmWindow* findWindow(Window window);
 
     // === Debug
     void printDebugText();

@@ -1,6 +1,11 @@
+#include <cmath>
 #include <X11/Xlib.h>
 #include "wmwindow.h"
 #include "workspace.h"
+
+
+using namespace std;
+
 
 WmWindow::WmWindow(Display *display, Window root, Window window) :
 display(display),
@@ -44,6 +49,7 @@ void WmWindow::setWorkspace(Workspace* workspace) {
 bool WmWindow::staysFloating() {
     return staysFloating_;
 }
+
 void WmWindow::toggleFloating() {
     staysFloating_ = !staysFloating_;
 }
@@ -77,6 +83,11 @@ bool WmWindow::supportsProtocol(Atom protocol) throw () {
     return found;
 }
 
+void WmWindow::relocate(int x, int y, int w, int h) {
+    XMoveResizeWindow(display, frame, x, y, max(1, w), max(1, h));
+    XMoveResizeWindow(display, window, 2, 2, max(1, w-4), max(1, h-4));
+}
+
 void WmWindow::close() {
     Atom wm_delete_window = getAtom("WM_DELETE_WINDOW");
 
@@ -99,7 +110,7 @@ void WmWindow::close() {
 
 void WmWindow::setDefaultEventMask() {
     XSetWindowAttributes attributes;
-    attributes.event_mask = EnterWindowMask | LeaveWindowMask | StructureNotifyMask;
+    attributes.event_mask = StructureNotifyMask | EnterWindowMask | LeaveWindowMask;
     XChangeWindowAttributes(display, window, CWEventMask, &attributes);
 }
 
