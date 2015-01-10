@@ -34,22 +34,22 @@ void WindowManager::onMapRequest() {
 }
 
 void WindowManager::onKeyPress() {
-    if (event.xkey.state & keyGrabber.defaultModifier()) {
+    if (event.xkey.state & keyGrabber->defaultModifier()) {
         if (event.xkey.state & ShiftMask) {
-            if (event.xkey.keycode == keyGrabber.keyClose()) {
+            if (event.xkey.keycode == keyGrabber->keyClose()) {
                 addDebugText("WINDOW CLOSE");
                 if (currentWindow)
                     currentWindow->close();
                 currentWindow = 0; // @TODO: Select next window by mouse position
             }
         } else {
-            if (event.xkey.keycode == keyGrabber.keyWorkspace1()) {
+            if (event.xkey.keycode == keyGrabber->keyWorkspace1()) {
                 addDebugText("WORKSPACE 1");
                 changeWorkspace(0);
-            } else if (event.xkey.keycode == keyGrabber.keyWorkspace2()) {
+            } else if (event.xkey.keycode == keyGrabber->keyWorkspace2()) {
                 addDebugText("WORKSPACE 2");
                 changeWorkspace(1);
-            } else if (event.xkey.keycode == keyGrabber.keyDMenu()) {
+            } else if (event.xkey.keycode == keyGrabber->keyDMenu()) {
                 addDebugText("DMENU SPAWN");
                 char *const parmList[] = {(char *) "dmenu_run", 0};
                 spawn("/usr/bin/dmenu_run", parmList);
@@ -62,7 +62,7 @@ void WindowManager::onKeyRelease() {
 }
 
 void WindowManager::onButtonPress() {
-    if (event.xbutton.state & keyGrabber.defaultModifier()) {
+    if (event.xbutton.state & keyGrabber->defaultModifier()) {
         if (event.xbutton.subwindow) {
             moveWindow = findWindow(event.xbutton.subwindow);
             if (!moveWindow)
@@ -99,7 +99,7 @@ void WindowManager::onLeave() {
 }
 
 void WindowManager::onMotion() {
-    if (event.xbutton.state & keyGrabber.defaultModifier()) {
+    if (event.xbutton.state & keyGrabber->defaultModifier()) {
         if (moveWindow) {
             int xdiff = event.xbutton.x_root - moveWindowStart.x_root;
             int ydiff = event.xbutton.y_root - moveWindowStart.y_root;

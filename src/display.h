@@ -3,7 +3,8 @@
 
 struct Free_XCloseDisplay {
     inline void operator()(Display* display) {
-        XCloseDisplay(display);
+        if (display)
+            XCloseDisplay(display);
     }
 };
 

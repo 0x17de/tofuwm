@@ -1,5 +1,5 @@
 #include <iostream>
-#include <cassert>
+#include <stdexcept>
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
 #include <unistd.h>
@@ -12,13 +12,15 @@
 using namespace std;
 
 
-WindowManager::WindowManager() :
-    displayPtr(XOpenDisplay(0), Free_XCloseDisplay()),
-    keyGrabber(displayPtr.get()),
-    root(DefaultRootWindow(displayPtr.get())),
-    fontHelper(displayPtr.get())
+WindowManager::WindowManager()
 {
-    assert((bool)displayPtr);
+    displayPtr = shared_ptr<Display>(XOpenDisplay(0), Free_XCloseDisplay());
+    if (!displayPtr) throw runtime_error("Display is not open");
+    root = XDefaultRootWindow(displayPtr.get());
+
+    keyGrabber = make_shared<KeyGrabber>(displayPtr.get());
+    fontHelper = make_shared<FontHelper>(displayPtr.get());
+
     XSelectInput(displayPtr.get(), root, SubstructureRedirectMask);
     currentWorkspace = &workspaces[0];
 }
@@ -109,7 +111,7 @@ void WindowManager::addDebugText(const std::string& text) {
 
 void WindowManager::printDebugText() {
     GC gc = XDefaultGC(displayPtr.get(), XDefaultScreen(displayPtr.get()));
-    fontHelper.setFont(gc);
+    fontHelper->setFont(gc);
 
     XClearWindow(displayPtr.get(), root);
 
@@ -144,36 +146,52 @@ void WindowManager::loop() {
         XNextEvent(display, &event);
         switch (event.type) {
             case MapRequest:
+                addDebugText("EVENT MapRequest");
                 onMapRequest(); break;
             case EnterNotify:
+                addDebugText("EVENT EnterNotify");
                 onEnter(); break;
             case LeaveNotify:
+                addDebugText("EVENT LeaveNotify");
                 onLeave(); break;
             case ConfigureRequest:
+                addDebugText("EVENT ConfigureRequest");
                 onConfigureRequest(); break;
             case CirculateRequest:
+                addDebugText("EVENT CirculateRequest");
                 onCirculateRequest(); break;
             case KeyPress:
+                addDebugText("EVENT KeyPress");
                 onKeyPress(); break;
             case ButtonPress:
+                addDebugText("EVENT ButtonPress");
                 onButtonPress(); break;
             case MotionNotify:
+                addDebugText("EVENT MotionNotify");
                 onMotion(); break;
             case ButtonRelease:
+                addDebugText("EVENT ButtonRelease");
                 onButtonRelease(); break;
             case CirculateNotify:
+                addDebugText("EVENT CirculateNotify");
                 onCirculateNotify(); break;
             case ConfigureNotify:
+                addDebugText("EVENT ConfigureNotify");
                 onConfigureNotify(); break;
             case DestroyNotify:
+                addDebugText("EVENT DestroyNotify");
                 onDestroyNotify(); break;
             case GravityNotify:
+                addDebugText("EVENT GravityNotify");
                 onGravityNotify(); break;
             case MapNotify:
+                addDebugText("EVENT MapNotify");
                 onMapNotify(); break;
             case ReparentNotify:
+                addDebugText("EVENT ReparentNotify");
                 onReparentNotify(); break;
             case UnmapNotify:
+                addDebugText("EVENT UnmapNotify");
                 onUnmapNotify(); break;
         }
         printDebugText();

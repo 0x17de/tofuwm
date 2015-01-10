@@ -36,11 +36,12 @@ private:
     XEvent event;
 
     std::shared_ptr<Display> displayPtr;
+    std::shared_ptr<KeyGrabber> keyGrabber;
+    std::shared_ptr<FontHelper> fontHelper;
+
     Window root;
     WmWindow* currentWindow;
     std::map<Window, std::shared_ptr<WmWindow>> windows;
-    KeyGrabber keyGrabber;
-    FontHelper fontHelper;
 
     // Workspaces
     Workspace workspaces[2];
