@@ -61,11 +61,6 @@ Atom WmWindow::getAtom(const std::string& protocol) {
     return XInternAtom(display, protocol.c_str(), false);
 }
 
-bool WmWindow::supportsProtocol(const std::string& protocol) throw () {
-    Atom wm_delete_window = XInternAtom(display, protocol.c_str(), false);
-    return supportsProtocol(wm_delete_window);
-}
-
 bool WmWindow::supportsProtocol(Atom protocol) throw () {
     bool found = false;
 

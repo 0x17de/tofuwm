@@ -24,7 +24,6 @@ public:
     bool staysFloating();
     void toggleFloating();
     Atom getAtom(const std::string& protocol);
-    bool supportsProtocol(const std::string& protocol) throw ();
     bool supportsProtocol(Atom protocol) throw ();
     void close();
     void setDefaultEventMask();
