@@ -40,15 +40,18 @@ void WindowManager::loop() {
             case KeyPress:
                 addDebugText("EVENT KeyPress");
                 onKeyPress(); break;
+            case KeyRelease:
+                addDebugText("EVENT KeyRelease");
+                onKeyRelease(); break;
             case ButtonPress:
                 addDebugText("EVENT ButtonPress");
                 onButtonPress(); break;
-            case MotionNotify:
-                addDebugText("EVENT MotionNotify");
-                onMotion(); break;
             case ButtonRelease:
                 addDebugText("EVENT ButtonRelease");
                 onButtonRelease(); break;
+            case MotionNotify:
+                addDebugText("EVENT MotionNotify");
+                onMotion(); break;
             case CirculateNotify:
                 addDebugText("EVENT CirculateNotify");
                 onCirculateNotify(); break;
