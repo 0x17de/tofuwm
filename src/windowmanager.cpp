@@ -22,7 +22,7 @@ WindowManager::WindowManager()
     keyGrabber = make_shared<KeyGrabber>(display);
     fontHelper = make_shared<FontHelper>(display);
 
-    XSelectInput(display, root, SubstructureRedirectMask);
+    XSelectInput(display, root, ResizeRedirectMask | SubstructureRedirectMask);
     currentWorkspace = &workspaces[0];
 }
 
@@ -161,6 +161,9 @@ void WindowManager::loop() {
             case ConfigureRequest:
                 addDebugText("EVENT ConfigureRequest");
                 onConfigureRequest(); break;
+            case ResizeRequest:
+                addDebugText("EVENT ResizeRequest");
+                onResizeRequest(); break;
             case CirculateRequest:
                 addDebugText("EVENT CirculateRequest");
                 onCirculateRequest(); break;

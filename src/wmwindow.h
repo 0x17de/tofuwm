@@ -27,6 +27,8 @@ public:
     bool supportsProtocol(Atom protocol) throw ();
     void close();
     void setDefaultEventMask();
+
+    void resize(int w, int h);
     void relocate(int x, int y, int w, int h);
 
     bool operator==(const Window& window);

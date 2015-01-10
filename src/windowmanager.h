@@ -71,6 +71,7 @@ private:
     void onButtonPress();
     void onButtonRelease();
     void onConfigureRequest();
+    void onResizeRequest();
     void onCirculateRequest();
     void onMapRequest();
 

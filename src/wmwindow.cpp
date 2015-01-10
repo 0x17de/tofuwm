@@ -81,6 +81,11 @@ bool WmWindow::supportsProtocol(Atom protocol) throw () {
     return found;
 }
 
+void WmWindow::resize(int w, int h) {
+    XResizeWindow(display, frame, max(1, w), max(1, h));
+    XResizeWindow(display, window, max(1, w-4), max(1, h-4));
+}
+
 void WmWindow::relocate(int x, int y, int w, int h) {
     XMoveResizeWindow(display, frame, x, y, max(1, w), max(1, h));
     XMoveResizeWindow(display, window, 2, 2, max(1, w-4), max(1, h-4));
@@ -108,8 +113,13 @@ void WmWindow::close() {
 
 void WmWindow::setDefaultEventMask() {
     XSetWindowAttributes attributes;
+
     attributes.event_mask = StructureNotifyMask | EnterWindowMask | LeaveWindowMask;
     XChangeWindowAttributes(display, window, CWEventMask, &attributes);
+
+    attributes.event_mask = SubstructureRedirectMask;
+    attributes.override_redirect = 1;
+    XChangeWindowAttributes(display, frame, CWOverrideRedirect | CWEventMask, &attributes);
 }
 
 bool WmWindow::operator==(const Window& window) {
