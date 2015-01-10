@@ -43,7 +43,7 @@ void WindowManager::selectDefaultInput() {
 }
 
 WmWindow* WindowManager::addWindow(Window window) {
-    shared_ptr<WmWindow> wPtr(make_shared<WmWindow>(display, root, window));
+    shared_ptr<WmWindow> wPtr(make_shared<WmWindow>(this, window));
     WmWindow* w = wPtr.get();
     windows.insert(make_pair(w->window, wPtr));
     windows.insert(make_pair(w->frame, wPtr));
@@ -70,10 +70,17 @@ WmWindow* WindowManager::addWindow(Window window) {
 }
 
 void WindowManager::setCurrentWindow(Window window) {
-    currentWindow = findWindow(window);
+    setCurrentWindow(findWindow(window));
+}
+
+void WindowManager::setCurrentWindow(WmWindow* window) {
+    currentWindow = window;
+
     stringstream ss;
     ss << "CURRENT WINDOW 0x" << hex << currentWindow;
     addDebugText(ss.str());
+
+    // @TODO: Set _NET_ACTIVE_WINDOW
 }
 
 void WindowManager::changeWorkspace(int number) {
@@ -86,7 +93,8 @@ void WindowManager::changeWorkspace(int number) {
     if (moveWindow)
         moveWindow->setWorkspace(currentWorkspace);
     currentWorkspace->show();
-    // @TODO: Select currentWindow by mouse position
+    selectNewCurrentWindow();
+    // @TODO: update _NET_CURRENT_DESKTOP, _NET_NUMBER_OF_DESKTOPS
 }
 
 void WindowManager::calculateDesktopSpace() {
@@ -99,6 +107,8 @@ void WindowManager::calculateDesktopSpace() {
     d.w = rAttr.width;
     d.h = rAttr.height;
 
+
+    // @TODO: docked, when: _NET_WM_WINDOW_TYPE => _NET_WM_WINDOW_TYPE_DOCK
     for (shared_ptr<WmWindow>& w : dockedWindows) {
         XWindowAttributes wAttr;
         XGetWindowAttributes(display, w->window, &wAttr);
@@ -120,6 +130,17 @@ void WindowManager::calculateDesktopSpace() {
             d.h = wAttr.y;
         }
     }
+}
+
+Atom WindowManager::getAtom(const std::string& protocol) {
+    return XInternAtom(display, protocol.c_str(), false);
+}
+
+void WindowManager::selectNewCurrentWindow() {
+    if (currentWorkspace->windows.size() > 0)
+        setCurrentWindow(currentWorkspace->windows.front());
+    else
+        setCurrentWindow(nullptr);
 }
 
 void WindowManager::spawn(const std::string& cmd, char *const argv[]) {

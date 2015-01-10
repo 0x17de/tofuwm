@@ -5,17 +5,17 @@
 #include <X11/Xlib.h>
 #include "wmcontainer.h"
 
+class WindowManager;
 class Workspace;
 class WmWindow : public WmContainer {
     bool staysFloating_ = false;
 public:
-    Display* display;
-    Window root;
+    WindowManager* wm;
     Window window;
     Window frame;
     Workspace* workspace = 0;
 
-    WmWindow(Display* display, Window root, Window window);
+    WmWindow(WindowManager* wm, Window window);
     ~WmWindow();
 
     virtual WmContainerType containerType();
@@ -27,7 +27,6 @@ public:
     void setWorkspace(Workspace* newWorkspace);
     bool staysFloating();
     void toggleFloating();
-    Atom getAtom(const std::string& protocol);
     bool supportsProtocol(Atom protocol) throw ();
     void close();
     void selectNoInput();

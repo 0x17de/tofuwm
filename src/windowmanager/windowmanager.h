@@ -34,16 +34,19 @@ private:
     bool moveWindowExpandYPositive;
 
     // Default
+public:
+    Display* display;
+    Window root;
+
+private:
     std::string wmname = "tofuwm";
     Cursor cursor;
     XEvent event;
 
     std::shared_ptr<Display> displayPtr;
-    Display* display;
     std::shared_ptr<KeyGrabber> keyGrabber;
     std::shared_ptr<FontHelper> fontHelper;
 
-    Window root;
     WmWindow* currentWindow = 0;
     std::map<Window, std::shared_ptr<WmWindow>> windows;
 
@@ -67,13 +70,20 @@ private:
     void calculateDesktopSpace();
     void spawn(const std::string& cmd, char *const argv[]);
     void setCurrentWindow(Window window);
+    void setCurrentWindow(WmWindow* window);
     WmWindow* addWindow(Window window);
     WmWindow* findWindow(Window window);
+    void selectNewCurrentWindow();
     static inline constexpr int workspaceCount() { return 10; }
 
+public:
+    Atom getAtom(const std::string& protocol);
+
+private:
     // === Debug
     void printDebugText();
     void addDebugText(const std::string& text);
+    void debugPrintUnknownAtom(Atom atom) throw();
 
     // === Events & Notifications
     void onMotion();
@@ -95,6 +105,11 @@ private:
     void onMapNotify();
     void onReparentNotify();
     void onUnmapNotify();
+
+    void onClientMessage();
+    void onNetWmState();
+    void onNetRequestFrameExtents();
+    void onNetRequestActiveWindow();
 
 public:
     WindowManager();

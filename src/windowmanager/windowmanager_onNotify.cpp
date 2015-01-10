@@ -18,7 +18,7 @@ void WindowManager::onLeaveNotify() {
         return;
 
     currentWindow->setActive(false);
-    setCurrentWindow(0);
+    setCurrentWindow(nullptr);
 }
 
 void WindowManager::onCirculateNotify() {
@@ -37,8 +37,7 @@ void WindowManager::onDestroyNotify() {
     windows.erase(it2);
 
     if (newCurrentWindow)
-        currentWindow = 0;
-    // @TODO: Select new currentWindow
+        selectNewCurrentWindow();
 }
 
 void WindowManager::onGravityNotify() {
@@ -55,6 +54,5 @@ void WindowManager::onUnmapNotify() {
     if (!w) return;
 
     if (w == currentWindow)
-        currentWindow = 0; // @TODO: Select new currentWindow
-
+        selectNewCurrentWindow();
 }

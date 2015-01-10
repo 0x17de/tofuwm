@@ -1,5 +1,6 @@
 #include <cmath>
 #include <X11/Xlib.h>
+#include "windowmanager/windowmanager.h"
 #include "wmwindow.h"
 #include "../workspace.h"
 
@@ -7,27 +8,26 @@
 using namespace std;
 
 
-WmWindow::WmWindow(Display *display, Window root, Window window) :
-display(display),
-root(root),
-window(window)
+WmWindow::WmWindow(WindowManager* wm, Window window) :
+        wm(wm),
+        window(window)
 {
     XWindowAttributes wAttr;
-    XGetWindowAttributes(display, window, &wAttr);
+    XGetWindowAttributes(wm->display, window, &wAttr);
 
-    frame = XCreateSimpleWindow(display, root, wAttr.x - 2, wAttr.y - 2, wAttr.width + 4, wAttr.height + 4, 0, 0, 0xff00ff);
-    XReparentWindow(display, window, frame, 2, 2);
-    XMapWindow(display, frame);
+    frame = XCreateSimpleWindow(wm->display, wm->root, wAttr.x - 2, wAttr.y - 2, wAttr.width + 4, wAttr.height + 4, 0, 0, 0xff00ff);
+    XReparentWindow(wm->display, window, frame, 2, 2);
+    XMapWindow(wm->display, frame);
 }
 
 WmWindow::~WmWindow() {
     selectNoInput();
     setWorkspace(0);
     XWindowAttributes wAttr;
-    XGetWindowAttributes(display, frame, &wAttr);
+    XGetWindowAttributes(wm->display, frame, &wAttr);
     if (window)
-        XReparentWindow(display, window, root, wAttr.x, wAttr.y);
-    XDestroyWindow(display, frame);
+        XReparentWindow(wm->display, window, wm->root, wAttr.x, wAttr.y);
+    XDestroyWindow(wm->display, frame);
 }
 
 WmContainerType WmWindow::containerType() {
@@ -35,16 +35,16 @@ WmContainerType WmWindow::containerType() {
 }
 
 void WmWindow::hide() {
-    XUnmapWindow(display, frame);
+    XUnmapWindow(wm->display, frame);
 }
 
 void WmWindow::show() {
-    XMapWindow(display, frame);
+    XMapWindow(wm->display, frame);
 }
 
 void WmWindow::setActive(bool active) {
-    XSetWindowBackground(display, frame, active ? 0x00ff00 : 0xff0000);
-    XClearWindow(display, frame);
+    XSetWindowBackground(wm->display, frame, active ? 0x00ff00 : 0xff0000);
+    XClearWindow(wm->display, frame);
 }
 
 void WmWindow::setWorkspace(Workspace* newWorkspace) {
@@ -63,17 +63,13 @@ void WmWindow::toggleFloating() {
     staysFloating_ = !staysFloating_;
 }
 
-Atom WmWindow::getAtom(const std::string& protocol) {
-    return XInternAtom(display, protocol.c_str(), false);
-}
-
 bool WmWindow::supportsProtocol(Atom protocol) throw () {
     bool found = false;
 
     int numberOfProtocols;
     Atom* protocols;
 
-    if (!XGetWMProtocols(display, window, &protocols, &numberOfProtocols))
+    if (!XGetWMProtocols(wm->display, window, &protocols, &numberOfProtocols))
         return false;
 
     for (int i = 0; i < numberOfProtocols; ++i) {
@@ -93,24 +89,24 @@ int WmWindow::minWindowSize() {
 }
 
 void WmWindow::resize(int w, int h) {
-    XResizeWindow(display, frame, max(minWindowSize()+4, w), max(minWindowSize()+4, h));
-    XResizeWindow(display, window, max(minWindowSize(), w-4), max(minWindowSize(), h-4));
+    XResizeWindow(wm->display, frame, max(minWindowSize()+4, w), max(minWindowSize()+4, h));
+    XResizeWindow(wm->display, window, max(minWindowSize(), w-4), max(minWindowSize(), h-4));
 }
 
 void WmWindow::relocate(int x, int y, int w, int h) {
-    XMoveResizeWindow(display, frame, x, y, max(minWindowSize()+4, w), max(minWindowSize()+4, h));
-    XResizeWindow(display, window, max(minWindowSize(), w-4), max(minWindowSize(), h-4));
+    XMoveResizeWindow(wm->display, frame, x, y, max(minWindowSize()+4, w), max(minWindowSize()+4, h));
+    XResizeWindow(wm->display, window, max(minWindowSize(), w-4), max(minWindowSize(), h-4));
 }
 
 void WmWindow::close() {
-    Atom wm_delete_window = getAtom("WM_DELETE_WINDOW");
+    Atom wm_delete_window = wm->getAtom("WM_DELETE_WINDOW");
 
     if (!supportsProtocol(wm_delete_window)) {
-        XDestroyWindow(display, window);
+        XDestroyWindow(wm->display, window);
         return;
     }
 
-    Atom wm_protocols = getAtom("WM_PROTOCOLS");
+    Atom wm_protocols = wm->getAtom("WM_PROTOCOLS");
 
     XClientMessageEvent xevent;
     xevent.type = ClientMessage;
@@ -119,31 +115,31 @@ void WmWindow::close() {
     xevent.format = 32;
     xevent.data.l[0] = wm_delete_window;
     xevent.data.l[1] = CurrentTime;
-    XSendEvent(display, window, false, 0, (XEvent*) &xevent);
+    XSendEvent(wm->display, window, false, 0, (XEvent*) &xevent);
 }
 
 void WmWindow::selectNoInput() {
     XSetWindowAttributes attributes;
 
     attributes.event_mask = 0;
-    XChangeWindowAttributes(display, frame, CWEventMask, &attributes);
+    XChangeWindowAttributes(wm->display, frame, CWEventMask, &attributes);
 }
 
 void WmWindow::selectDefaultInput() {
     XSetWindowAttributes attributes;
 
     attributes.event_mask = SubstructureRedirectMask;
-    XChangeWindowAttributes(display, frame, CWEventMask, &attributes);
+    XChangeWindowAttributes(wm->display, frame, CWEventMask, &attributes);
 }
 
 void WmWindow::setDefaultEventMask() {
     XSetWindowAttributes attributes;
 
     attributes.event_mask = StructureNotifyMask | EnterWindowMask | LeaveWindowMask;
-    XChangeWindowAttributes(display, window, CWEventMask, &attributes);
+    XChangeWindowAttributes(wm->display, window, CWEventMask, &attributes);
 
     attributes.override_redirect = 1;
-    XChangeWindowAttributes(display, frame, CWOverrideRedirect, &attributes);
+    XChangeWindowAttributes(wm->display, frame, CWOverrideRedirect, &attributes);
 }
 
 bool WmWindow::operator==(const Window& window) {

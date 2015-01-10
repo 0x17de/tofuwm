@@ -6,9 +6,9 @@
 #include "containers/wmwindow.h"
 
 class Workspace {
+public:
     std::list<WmWindow*> windows;
 
-public:
     Workspace();
     ~Workspace();
 

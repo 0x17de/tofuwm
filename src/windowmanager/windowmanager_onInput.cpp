@@ -30,7 +30,7 @@ void WindowManager::onKeyPress() {
                 addDebugText("WINDOW CLOSE");
                 if (currentWindow)
                     currentWindow->close();
-                currentWindow = 0; // @TODO: Select next window by mouse position
+                selectNewCurrentWindow();
             }
         } else {
             if (event.xkey.keycode == keyGrabber->keyDMenu()) {
@@ -60,6 +60,7 @@ void WindowManager::onButtonPress() {
             moveWindow = findWindow(event.xbutton.subwindow);
             if (!moveWindow)
                 return;
+            moveWindow->selectNoInput();
             currentWindow = moveWindow;
             currentWindow->setActive(true);
             XGetWindowAttributes(display, moveWindow->frame, &moveWindowAttributes);
@@ -74,6 +75,9 @@ void WindowManager::onButtonPress() {
 }
 
 void WindowManager::onButtonRelease() {
-    moveWindowStart.subwindow = None;
-    moveWindow = 0;
+    if (moveWindow) {
+        moveWindow->selectDefaultInput();
+        moveWindowStart.subwindow = None;
+        moveWindow = 0;
+    }
 }

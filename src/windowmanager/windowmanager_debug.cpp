@@ -9,6 +9,14 @@
 using namespace std;
 
 
+void WindowManager::debugPrintUnknownAtom(Atom atom) throw() {
+    char* name = XGetAtomName(display, atom);
+    stringstream ss;
+    ss << "UnkCMsg ATOM " << name;
+    addDebugText(ss.str());
+    XFree(name);
+}
+
 void WindowManager::addDebugText(const std::string& text) {
     static string lastText;
     if (lastText == text) {
