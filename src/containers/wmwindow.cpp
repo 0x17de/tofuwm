@@ -21,7 +21,8 @@ window(window)
 }
 
 WmWindow::~WmWindow() {
-    workspace->removeWindow(this);
+    selectNoInput();
+    setWorkspace(0);
     XWindowAttributes wAttr;
     XGetWindowAttributes(display, frame, &wAttr);
     if (window)
@@ -50,7 +51,8 @@ void WmWindow::setWorkspace(Workspace* newWorkspace) {
     if (workspace)
         workspace->removeWindow(this);
     workspace = newWorkspace;
-    workspace->addWindow(this);
+    if (newWorkspace)
+        workspace->addWindow(this);
 }
 
 bool WmWindow::staysFloating() {
