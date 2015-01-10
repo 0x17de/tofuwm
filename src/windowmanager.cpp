@@ -36,8 +36,6 @@ void WindowManager::initCursor() {
 }
 
 void WindowManager::initBackground() {
-    Display *display = display;
-
     XSetWindowBackground(display, root, 0xc0c0c0);
     XClearWindow(display, root);
     XFlush(display);
@@ -105,9 +103,15 @@ void WindowManager::calculateDesktopSpace() {
 }
 
 void WindowManager::addDebugText(const std::string& text) {
-    debugStrings.push_front(text);
-    if (debugStrings.size() > 30)
-        debugStrings.pop_back();
+    static string lastText;
+    if (lastText == text) {
+        debugStrings.front() += ".";
+    } else {
+        debugStrings.push_front(text);
+        if (debugStrings.size() > 30)
+            debugStrings.pop_back();
+        lastText = text;
+    }
 }
 
 void WindowManager::printDebugText() {
@@ -140,7 +144,6 @@ WmWindow* WindowManager::findWindow(Window window) {
 }
 
 void WindowManager::loop() {
-    Display *display = display;
     // Loop
     printDebugText();
     while(running) {
