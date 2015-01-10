@@ -7,25 +7,25 @@ using namespace std;
 
 
 void WindowManager::onMapRequest() {
-    shared_ptr <WmWindow> w(make_shared<WmWindow>(displayPtr.get(), event.xmaprequest.window));
-    currentWorkspace->addWindow(w);
-    w->setDefaultEventMask();
-
+    shared_ptr <WmWindow> w(make_shared<WmWindow>(displayPtr.get(), root, event.xmaprequest.window));
     windows.insert(make_pair(event.xmaprequest.window, w));
+    w->setWorkspace(currentWorkspace);
+    currentWorkspace->addWindow(w.get());
+    w->setDefaultEventMask();
+    XMapWindow(displayPtr.get(), w->window);
+    w->show();
+
     if (currentWindow == 0)
-        currentWindow = w.get()->window;
+        currentWindow = w.get();
 }
 
 void WindowManager::onKeyPress() {
-    if (event.xkey.state & Mod4Mask) {
+    if (event.xkey.state & keyGrabber.defaultModifier()) {
         if (event.xkey.state & ShiftMask) {
             if (event.xkey.keycode == keyGrabber.keyClose()) {
                 addDebugText("WINDOW CLOSE");
-                if (currentWindow != 0) {
-                    auto it = windows.find(currentWindow);
-                    if (it != windows.end())
-                        it->second->close();
-                }
+                if (currentWindow)
+                    currentWindow->close();
                 currentWindow = 0; // @TODO: Select next window by mouse position
             }
         } else {
@@ -54,12 +54,14 @@ void WindowManager::onKeyRelease() {
 }
 
 void WindowManager::onButtonPress() {
-    if (event.xbutton.subwindow != None) {
-        XGetWindowAttributes(displayPtr.get(), event.xbutton.subwindow, &moveWindowAttributes);
-        moveWindowStart = event.xbutton;
-        if (moveWindowStart.button == 3) { // Right mouse
-            moveWindowExpandXPositive = moveWindowStart.x_root >= moveWindowAttributes.x + moveWindowAttributes.width / 2;
-            moveWindowExpandYPositive = moveWindowStart.y_root >= moveWindowAttributes.y + moveWindowAttributes.height / 2;
+    if (event.xbutton.state & keyGrabber.defaultModifier()) {
+        if (event.xbutton.subwindow != None) {
+            XGetWindowAttributes(displayPtr.get(), event.xbutton.subwindow, &moveWindowAttributes);
+            moveWindowStart = event.xbutton;
+            if (moveWindowStart.button == 3) { // Right mouse
+                moveWindowExpandXPositive = moveWindowStart.x_root >= moveWindowAttributes.x + moveWindowAttributes.width / 2;
+                moveWindowExpandYPositive = moveWindowStart.y_root >= moveWindowAttributes.y + moveWindowAttributes.height / 2;
+            }
         }
     }
 }
@@ -70,24 +72,31 @@ void WindowManager::onButtonRelease() {
 
 void WindowManager::onEnter() {
     setCurrentWindow(event.xcrossing.window);
+    currentWindow->setActive(true);
 }
 
 void WindowManager::onLeave() {
+    if (!currentWindow)
+        return;
+
+    currentWindow->setActive(false);
     setCurrentWindow(0);
 }
 
 void WindowManager::onMotion() {
-    if (moveWindowStart.subwindow != None) {
-        int xdiff = event.xbutton.x_root - moveWindowStart.x_root;
-        int ydiff = event.xbutton.y_root - moveWindowStart.y_root;
-        if (moveWindowStart.button == 1) { // Left mouse
-            XMoveResizeWindow(displayPtr.get(), moveWindowStart.subwindow,
-                    moveWindowAttributes.x + xdiff, moveWindowAttributes.y + ydiff,
-                    max(1, moveWindowAttributes.width), max(1, moveWindowAttributes.height));
-        } else if (moveWindowStart.button == 3) { // Right mouse
-            XMoveResizeWindow(displayPtr.get(), moveWindowStart.subwindow,
-                    moveWindowAttributes.x + (moveWindowExpandXPositive ? 0 : xdiff), moveWindowAttributes.y + (moveWindowExpandYPositive ? 0 : ydiff),
-                    max(1, moveWindowAttributes.width + (moveWindowExpandXPositive ? xdiff : -xdiff)), max(1, moveWindowAttributes.height + (moveWindowExpandYPositive ? ydiff : -ydiff)));
+    if (event.xbutton.state & keyGrabber.defaultModifier()) {
+        if (moveWindowStart.subwindow != None) {
+            int xdiff = event.xbutton.x_root - moveWindowStart.x_root;
+            int ydiff = event.xbutton.y_root - moveWindowStart.y_root;
+            if (moveWindowStart.button == 1) { // Left mouse
+                XMoveResizeWindow(displayPtr.get(), moveWindowStart.subwindow,
+                        moveWindowAttributes.x + xdiff, moveWindowAttributes.y + ydiff,
+                        max(1, moveWindowAttributes.width), max(1, moveWindowAttributes.height));
+            } else if (moveWindowStart.button == 3) { // Right mouse
+                XMoveResizeWindow(displayPtr.get(), moveWindowStart.subwindow,
+                        moveWindowAttributes.x + (moveWindowExpandXPositive ? 0 : xdiff), moveWindowAttributes.y + (moveWindowExpandYPositive ? 0 : ydiff),
+                        max(1, moveWindowAttributes.width + (moveWindowExpandXPositive ? xdiff : -xdiff)), max(1, moveWindowAttributes.height + (moveWindowExpandYPositive ? ydiff : -ydiff)));
+            }
         }
     }
 }

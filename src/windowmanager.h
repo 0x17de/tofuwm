@@ -35,7 +35,7 @@ private:
 
     std::shared_ptr<Display> displayPtr;
     Window root;
-    Window currentWindow = 0; // @TODO: make to WmWindow?
+    WmWindow* currentWindow;
     std::map<Window, std::shared_ptr<WmWindow>> windows;
     KeyGrabber keyGrabber;
     FontHelper fontHelper;

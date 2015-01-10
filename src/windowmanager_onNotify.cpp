@@ -12,9 +12,14 @@ void WindowManager::onConfigureNotify() {
 }
 
 void WindowManager::onDestroyNotify() {
-    if (currentWindow == event.xdestroywindow.window)
+    bool newCurrentWindow = currentWindow && *currentWindow == event.xdestroywindow.window;
+
+    auto it = windows.find(event.xdestroywindow.window);
+    it->second->window = 0; // as it is already destroyed
+    windows.erase(it);
+
+    if (newCurrentWindow)
         currentWindow = 0;
-    windows.erase(event.xdestroywindow.window);
     // @TODO: Select new currentWindow
 }
 

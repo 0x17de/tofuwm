@@ -1,21 +1,51 @@
 #include <X11/Xlib.h>
 #include "wmwindow.h"
+#include "workspace.h"
 
-WmWindow::WmWindow(Display *display, Window window) :
+WmWindow::WmWindow(Display *display, Window root, Window window) :
 display(display),
+root(root),
 window(window)
 {
+    XWindowAttributes wAttr;
+    XGetWindowAttributes(display, window, &wAttr);
+
+    frame = XCreateSimpleWindow(display, root, wAttr.x - 2, wAttr.y - 2, wAttr.width + 4, wAttr.height + 4, 0, 0, 0xff00ff);
+    XReparentWindow(display, window, frame, 2, 2);
+    XMapWindow(display, frame);
 }
 
 WmWindow::~WmWindow() {
+    workspace->removeWindow(this);
+    XWindowAttributes wAttr;
+    XGetWindowAttributes(display, frame, &wAttr);
+    if (window)
+        XReparentWindow(display, window, root, wAttr.x, wAttr.y);
+    XDestroyWindow(display, frame);
 }
 
 void WmWindow::hide() {
-    XUnmapWindow(display, window);
+    XUnmapWindow(display, frame);
 }
 
 void WmWindow::show() {
-    XMapWindow(display, window);
+    XMapWindow(display, frame);
+}
+
+void WmWindow::setActive(bool active) {
+    XSetWindowBackground(display, frame, active ? 0x00ff00 : 0xff0000);
+    XClearWindow(display, frame);
+}
+
+void WmWindow::setWorkspace(Workspace* workspace) {
+    this->workspace = workspace;
+}
+
+bool WmWindow::staysFloating() {
+    return staysFloating_;
+}
+void WmWindow::toggleFloating() {
+    staysFloating_ = !staysFloating_;
 }
 
 Atom WmWindow::getAtom(const std::string& protocol) {
@@ -64,11 +94,15 @@ void WmWindow::close() {
     xevent.format = 32;
     xevent.data.l[0] = wm_delete_window;
     xevent.data.l[1] = CurrentTime;
-    XSendEvent(display, window, false, 0, (XEvent *)&xevent);
+    XSendEvent(display, window, false, 0, (XEvent*) &xevent);
 }
 
 void WmWindow::setDefaultEventMask() {
     XSetWindowAttributes attributes;
-    attributes.event_mask = EnterWindowMask | LeaveWindowMask;
+    attributes.event_mask = EnterWindowMask | LeaveWindowMask | StructureNotifyMask;
     XChangeWindowAttributes(display, window, CWEventMask, &attributes);
+}
+
+bool WmWindow::operator==(const Window& window) {
+    return this->window == window;
 }

@@ -11,16 +11,20 @@ Workspace::~Workspace() {
 }
 
 void Workspace::hide() {
-    for(shared_ptr<WmWindow> w : windows)
+    for(WmWindow* w : windows)
         w->hide();
 }
 
 void Workspace::show() {
-    for(shared_ptr<WmWindow> w : windows)
+    for(WmWindow* w : windows)
         w->show();
 }
 
-void Workspace::addWindow(std::shared_ptr<WmWindow> w) {
+void Workspace::addWindow(WmWindow* w) {
     windows.push_back(w);
     w->show();
+}
+
+void Workspace::removeWindow(WmWindow* w) {
+    windows.remove(w);
 }

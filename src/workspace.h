@@ -6,7 +6,7 @@
 #include "wmwindow.h"
 
 class Workspace {
-    std::list<std::shared_ptr<WmWindow>> windows;
+    std::list<WmWindow*> windows;
 
 public:
     Workspace();
@@ -15,7 +15,8 @@ public:
     void hide();
     void show();
 
-    void addWindow(std::shared_ptr<WmWindow> w);
+    void addWindow(WmWindow* w);
+    void removeWindow(WmWindow* w);
 };
 
 #endif // WORKSPACE_H

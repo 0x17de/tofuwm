@@ -44,7 +44,10 @@ void WindowManager::run() {
 }
 
 void WindowManager::setCurrentWindow(Window window) {
-    currentWindow = window;
+    auto it = windows.find(window);
+    if (it == windows.end())
+        return;
+    currentWindow = it->second.get();
 
     stringstream ss;
     ss << "CURRENT WINDOW 0x" << hex << currentWindow;
@@ -129,24 +132,39 @@ void WindowManager::loop() {
     printDebugText();
     while(running) {
         XNextEvent(display, &event);
-        if (event.type == MapRequest) {
-            onMapRequest();
-        } else if (event.type == EnterNotify) {
-            onEnter();
-        } else if (event.type == LeaveNotify) {
-            onLeave();
-        } else if (event.type == ConfigureRequest) {
-            onConfigureRequest();
-        } else if (event.type == CirculateRequest) {
-            onCirculateRequest();
-        } else if (event.type == KeyPress) {
-            onKeyPress();
-        } else if (event.type == ButtonPress) {
-            onButtonPress();
-        } else if (event.type == MotionNotify) {
-            onMotion();
-        } else if (event.type == ButtonRelease) {
-            onButtonRelease();
+        switch (event.type) {
+            case MapRequest:
+                onMapRequest(); break;
+            case EnterNotify:
+                onEnter(); break;
+            case LeaveNotify:
+                onLeave(); break;
+            case ConfigureRequest:
+                onConfigureRequest(); break;
+            case CirculateRequest:
+                onCirculateRequest(); break;
+            case KeyPress:
+                onKeyPress(); break;
+            case ButtonPress:
+                onButtonPress(); break;
+            case MotionNotify:
+                onMotion(); break;
+            case ButtonRelease:
+                onButtonRelease(); break;
+            case CirculateNotify:
+                onCirculateNotify(); break;
+            case ConfigureNotify:
+                onConfigureNotify(); break;
+            case DestroyNotify:
+                onDestroyNotify(); break;
+            case GravityNotify:
+                onGravityNotify(); break;
+            case MapNotify:
+                onMapNotify(); break;
+            case ReparentNotify:
+                onReparentNotify(); break;
+            case UnmapNotify:
+                onUnmapNotify(); break;
         }
         printDebugText();
     }
