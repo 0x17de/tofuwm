@@ -133,8 +133,7 @@ void WmWindow::selectDefaultInput() {
     XSetWindowAttributes attributes;
 
     attributes.event_mask = SubstructureRedirectMask;
-    attributes.override_redirect = 1;
-    XChangeWindowAttributes(display, frame, CWOverrideRedirect | CWEventMask, &attributes);
+    XChangeWindowAttributes(display, frame, CWEventMask, &attributes);
 }
 
 void WmWindow::setDefaultEventMask() {
