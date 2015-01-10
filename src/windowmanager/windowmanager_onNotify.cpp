@@ -5,6 +5,22 @@
 using namespace std;
 
 
+void WindowManager::onEnterNotify() {
+    if (moveWindow)
+        return;
+
+    setCurrentWindow(event.xcrossing.window);
+    currentWindow->setActive(true);
+}
+
+void WindowManager::onLeaveNotify() {
+    if (!currentWindow || moveWindow)
+        return;
+
+    currentWindow->setActive(false);
+    setCurrentWindow(0);
+}
+
 void WindowManager::onCirculateNotify() {
 }
 
@@ -28,10 +44,10 @@ void WindowManager::onDestroyNotify() {
 void WindowManager::onGravityNotify() {
 }
 
-void WindowManager::onMapNotify() {
+void WindowManager::onReparentNotify() {
 }
 
-void WindowManager::onReparentNotify() {
+void WindowManager::onMapNotify() {
 }
 
 void WindowManager::onUnmapNotify() {

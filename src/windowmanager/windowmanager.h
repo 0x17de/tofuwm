@@ -73,8 +73,8 @@ private:
 
     // === Events & Notifications
     void onMotion();
-    void onEnter();
-    void onLeave();
+    void onEnterNotify();
+    void onLeaveNotify();
     void onKeyPress();
     void onKeyRelease();
     void onButtonPress();

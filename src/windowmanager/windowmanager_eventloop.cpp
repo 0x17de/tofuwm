@@ -24,10 +24,10 @@ void WindowManager::loop() {
                 onMapRequest(); break;
             case EnterNotify:
                 addDebugText("EVENT EnterNotify");
-                onEnter(); break;
+                onEnterNotify(); break;
             case LeaveNotify:
                 addDebugText("EVENT LeaveNotify");
-                onLeave(); break;
+                onLeaveNotify(); break;
             case ConfigureRequest:
                 addDebugText("EVENT ConfigureRequest");
                 onConfigureRequest(); break;

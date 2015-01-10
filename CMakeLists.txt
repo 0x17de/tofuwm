@@ -13,7 +13,7 @@ set(SOURCE_FILES
     src/windowmanager/windowmanager_debug.cpp
     src/windowmanager/windowmanager_init.cpp
     src/windowmanager/windowmanager_eventloop.cpp
-    src/windowmanager/windowmanager_onEvent.cpp
+    src/windowmanager/windowmanager_onRequest.cpp
     src/windowmanager/windowmanager_onInput.cpp
     src/windowmanager/windowmanager_onNotify.cpp
     src/keygrabber.cpp src/keygrabber.h
