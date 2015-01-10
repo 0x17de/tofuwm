@@ -44,7 +44,7 @@ void WindowManager::initBackground() {
     XFlush(display);
 }
 
-void WindowManager::addExistingWindows() {
+void WindowManager::addExistingWindows() throw() {
     Window lroot, lparent;
     Window* children;
     unsigned int numberOfChildren;

@@ -58,7 +58,7 @@ private:
     void setWmName();
     void initCursor();
     void initBackground();
-    void addExistingWindows();
+    void addExistingWindows() throw();
     void selectInput(int mask);
     void selectNoInput();
     void selectDefaultInput();
