@@ -99,7 +99,7 @@ void WmWindow::resize(int w, int h) {
 
 void WmWindow::relocate(int x, int y, int w, int h) {
     XMoveResizeWindow(display, frame, x, y, max(minWindowSize()+4, w), max(minWindowSize()+4, h));
-    XMoveResizeWindow(display, window, 2, 2, max(minWindowSize(), w-4), max(minWindowSize(), h-4));
+    XResizeWindow(display, window, max(minWindowSize(), w-4), max(minWindowSize(), h-4));
 }
 
 void WmWindow::close() {

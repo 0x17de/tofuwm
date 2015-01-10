@@ -23,7 +23,7 @@ void WindowManager::onConfigureRequest() { // @TODO: fix window jumping
 
         WmWindow* w = findWindow(event.xconfigurerequest.window);
         if (w && w->window == event.xconfigurerequest.window)
-            w->relocate(event.xconfigurerequest.x-2, event.xconfigurerequest.y-2, event.xconfigurerequest.width+4, event.xconfigurerequest.height+4);
+            w->relocate(event.xconfigurerequest.x - 2, event.xconfigurerequest.y - 2, event.xconfigurerequest.width + 4, event.xconfigurerequest.height + 4);
     }
 }
 
@@ -35,7 +35,7 @@ void WindowManager::onResizeRequest() { // @TODO: fix resize request
 
         WmWindow* w = findWindow(event.xresizerequest.window);
         if (w && w->window == event.xresizerequest.window)
-            w->resize(event.xresizerequest.width+4, event.xresizerequest.height+4);
+            w->resize(event.xresizerequest.width + 4, event.xresizerequest.height + 4);
     }
 }
 

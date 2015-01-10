@@ -34,6 +34,7 @@ private:
     bool moveWindowExpandYPositive;
 
     // Default
+    std::string wmname = "tofuwm";
     Cursor cursor;
     XEvent event;
 
@@ -54,6 +55,7 @@ private:
     Workspace* currentWorkspace;
 
     // === Methods
+    void setWmName();
     void initCursor();
     void initBackground();
     void addExistingWindows();

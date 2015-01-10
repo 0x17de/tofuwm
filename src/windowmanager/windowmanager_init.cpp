@@ -1,18 +1,18 @@
 #include <iostream>
 #include <stdexcept>
 #include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/Xatom.h>
 #include <X11/cursorfont.h>
-#include <unistd.h>
-#include <sstream>
 
 #include "windowmanager.h"
-#include "display.h"
 
 
 using namespace std;
 
 
 void WindowManager::run() {
+    setWmName();
     initCursor();
     initBackground();
     calculateDesktopSpace(); // Initialize space.
@@ -20,6 +20,17 @@ void WindowManager::run() {
     selectDefaultInput();
     calculateDesktopSpace(); // Find docked windows.
     loop();
+}
+
+void WindowManager::setWmName() {
+    XTextProperty text;
+
+    text.value = (unsigned char *) wmname.c_str();
+    text.encoding = XA_STRING;
+    text.format = 8;
+    text.nitems = wmname.length();
+
+    XSetWMName(display, root, &text);
 }
 
 void WindowManager::initCursor() {
