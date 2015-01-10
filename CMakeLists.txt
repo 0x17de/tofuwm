@@ -9,7 +9,8 @@ find_package(X11 REQUIRED)
 set(SOURCE_FILES
     src/main.cpp
     src/keygrabber.cpp src/keygrabber.h
-    src/windowmanager.cpp src/windowmanager_onEvent.cpp src/windowmanager_onNotify.cpp src/windowmanager.h
+    src/windowmanager.cpp src/windowmanager.h
+    src/windowmanager_onEvent.cpp src/windowmanager_onInput.cpp src/windowmanager_onNotify.cpp
     src/display.h
     src/workspace.cpp src/workspace.h
     src/fonthelper.cpp src/fonthelper.h
