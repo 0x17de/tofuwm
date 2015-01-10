@@ -33,7 +33,7 @@ void WindowManager::onKeyPress() {
                 addDebugText("WORKSPACE 1");
                 changeWorkspace(0);
             } else if (event.xkey.keycode == keyGrabber.keyWorkspace2()) {
-                addDebugText("WORKSPACE 0");
+                addDebugText("WORKSPACE 2");
                 changeWorkspace(1);
             } else if (event.xkey.keycode == keyGrabber.keyDMenu()) {
                 addDebugText("DMENU SPAWN");
