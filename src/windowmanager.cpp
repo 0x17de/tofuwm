@@ -22,7 +22,6 @@ WindowManager::WindowManager()
     keyGrabber = make_shared<KeyGrabber>(display);
     fontHelper = make_shared<FontHelper>(display);
 
-    selectDefaultInput();
     currentWorkspace = &workspaces[0];
 }
 
@@ -57,8 +56,57 @@ void WindowManager::run() {
     // @TODO: Scan and add initially existing windows. Then set default event mask.
     initCursor();
     initBackground();
-    calculateDesktopSpace();
+    calculateDesktopSpace(); // Initialize space.
+    addExistingWindows();
+    selectDefaultInput();
+    calculateDesktopSpace(); // Find docked windows.
     loop();
+}
+
+WmWindow* WindowManager::addWindow(Window window) {
+    shared_ptr<WmWindow> wPtr(make_shared<WmWindow>(display, root, window));
+    WmWindow* w = wPtr.get();
+    windows.insert(make_pair(w->window, wPtr));
+    windows.insert(make_pair(w->frame, wPtr));
+
+    w->setWorkspace(currentWorkspace);
+
+    stringstream ss;
+    ss << desktop.x << ":" << desktop.w << ":" << desktop.y << ":" << desktop.h;
+    addDebugText(ss.str());
+
+    XWindowAttributes attributes;
+    XGetWindowAttributes(display, w->frame, &attributes);
+    w->relocate(desktop.x + (desktop.w - attributes.width) / 2,
+            desktop.y + (desktop.h - attributes.height) / 2,
+            attributes.width, attributes.height);
+
+    w->selectDefaultInput();
+    w->setDefaultEventMask();
+    w->show();
+
+    currentWindow = w;
+
+    return w;
+}
+
+void WindowManager::addExistingWindows() {
+    Window lroot, lparent;
+    Window* children;
+    unsigned int numberOfChildren;
+
+    Status status = XQueryTree(display, root, &lroot, &lparent, &children, &numberOfChildren);
+    if (status == BadWindow)
+        throw runtime_error("BadWindow when enumerating windows.");
+    if (!children)
+        return;
+
+    for (int i = 0; i < numberOfChildren; ++i) {
+        WmWindow* w = addWindow(children[i]);
+        w->setWorkspace(currentWorkspace);
+    }
+
+    XFree(children);
 }
 
 void WindowManager::setCurrentWindow(Window window) {

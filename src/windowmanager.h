@@ -42,7 +42,7 @@ private:
     std::shared_ptr<FontHelper> fontHelper;
 
     Window root;
-    WmWindow* currentWindow;
+    WmWindow* currentWindow = 0;
     std::map<Window, std::shared_ptr<WmWindow>> windows;
 
     // Tiling
@@ -55,6 +55,7 @@ private:
     // === Methods
     void initCursor();
     void initBackground();
+    void addExistingWindows();
     void selectInput(int mask);
     void selectNoInput();
     void selectDefaultInput();
@@ -63,6 +64,7 @@ private:
     void calculateDesktopSpace();
     void spawn(const std::string& cmd, char *const argv[]);
     void setCurrentWindow(Window window);
+    WmWindow* addWindow(Window window);
     WmWindow* findWindow(Window window);
 
     // === Debug

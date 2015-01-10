@@ -35,4 +35,10 @@ void WindowManager::onReparentNotify() {
 }
 
 void WindowManager::onUnmapNotify() {
+    WmWindow* w = findWindow(event.xunmap.window);
+    if (!w) return;
+
+    if (w == currentWindow)
+        currentWindow = 0; // @TODO: Select new currentWindow
+
 }

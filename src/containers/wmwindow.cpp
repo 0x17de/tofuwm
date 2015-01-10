@@ -73,7 +73,8 @@ bool WmWindow::supportsProtocol(Atom protocol) throw () {
     int numberOfProtocols;
     Atom* protocols;
 
-    XGetWMProtocols(display, window, &protocols, &numberOfProtocols);
+    if (!XGetWMProtocols(display, window, &protocols, &numberOfProtocols))
+        return false;
 
     for (int i = 0; i < numberOfProtocols; ++i) {
         if (protocols[i] == protocol) {
