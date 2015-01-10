@@ -3,7 +3,7 @@
 
 #include <list>
 #include <memory>
-#include "wmwindow.h"
+#include "containers/wmwindow.h"
 
 class Workspace {
     std::list<WmWindow*> windows;

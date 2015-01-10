@@ -7,7 +7,8 @@
 #include <X11/Xlib.h>
 #include "keygrabber.h"
 #include "workspace.h"
-#include "wmwindow.h"
+#include "containers/wmwindow.h"
+#include "containers/wmcontainer.h"
 #include "fonthelper.h"
 
 struct Geometry {
@@ -43,6 +44,9 @@ private:
     Window root;
     WmWindow* currentWindow;
     std::map<Window, std::shared_ptr<WmWindow>> windows;
+
+    // Tiling
+    std::shared_ptr<WmContainer> rootContainer;
 
     // Workspaces
     Workspace workspaces[2];

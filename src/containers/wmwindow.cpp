@@ -1,7 +1,7 @@
 #include <cmath>
 #include <X11/Xlib.h>
 #include "wmwindow.h"
-#include "workspace.h"
+#include "../workspace.h"
 
 
 using namespace std;
@@ -27,6 +27,10 @@ WmWindow::~WmWindow() {
     if (window)
         XReparentWindow(display, window, root, wAttr.x, wAttr.y);
     XDestroyWindow(display, frame);
+}
+
+WmContainerType WmWindow::containerType() {
+    return WmContainerType::Window;
 }
 
 void WmWindow::hide() {
@@ -86,12 +90,12 @@ int WmWindow::minWindowSize() {
 }
 
 void WmWindow::resize(int w, int h) {
-    XResizeWindow(display, frame, max(minWindowSize(), w), max(minWindowSize(), h));
+    XResizeWindow(display, frame, max(minWindowSize()+4, w), max(minWindowSize()+4, h));
     XResizeWindow(display, window, max(minWindowSize(), w-4), max(minWindowSize(), h-4));
 }
 
 void WmWindow::relocate(int x, int y, int w, int h) {
-    XMoveResizeWindow(display, frame, x, y, max(minWindowSize(), w), max(minWindowSize(), h));
+    XMoveResizeWindow(display, frame, x, y, max(minWindowSize()+4, w), max(minWindowSize()+4, h));
     XMoveResizeWindow(display, window, 2, 2, max(minWindowSize(), w-4), max(minWindowSize(), h-4));
 }
 

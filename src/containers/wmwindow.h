@@ -3,9 +3,10 @@
 
 #include <string>
 #include <X11/Xlib.h>
+#include "wmcontainer.h"
 
 class Workspace;
-class WmWindow {
+class WmWindow : public WmContainer {
     bool staysFloating_ = false;
 public:
     Display* display;
@@ -16,6 +17,8 @@ public:
 
     WmWindow(Display* display, Window root, Window window);
     ~WmWindow();
+
+    virtual WmContainerType containerType();
 
     void show();
     void hide();
