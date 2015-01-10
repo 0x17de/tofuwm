@@ -6,14 +6,14 @@
 class KeyGrabber {
     Display* display;
     Window root;
+    int workspaceCount;
 
 public:
-    KeyGrabber(Display* display);
+    KeyGrabber(Display* display, int workspaceCount);
     ~KeyGrabber();
 
     int defaultModifier();
-    int keyWorkspace1();
-    int keyWorkspace2();
+    int keyWorkspace(int number);
     int keyClose();
     int keyDMenu();
 };

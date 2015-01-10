@@ -1,17 +1,19 @@
 #include "keygrabber.h"
 
-KeyGrabber::KeyGrabber(Display* display)
+KeyGrabber::KeyGrabber(Display* display, int workspaceCount)
 :
     display(display),
-    root(DefaultRootWindow(display))
+    root(DefaultRootWindow(display)),
+    workspaceCount(workspaceCount)
 {
     XGrabButton(display, 1, defaultModifier(), root, True, ButtonPressMask|ButtonReleaseMask|PointerMotionMask, GrabModeAsync, GrabModeAsync, None, None);
     XGrabButton(display, 3, defaultModifier(), root, True, ButtonPressMask|ButtonReleaseMask|PointerMotionMask, GrabModeAsync, GrabModeAsync, None, None);
 
     XGrabKey(display, keyDMenu(), defaultModifier(), root, True, GrabModeAsync, GrabModeAsync);
     XGrabKey(display, keyClose(), defaultModifier()|ShiftMask, root, True, GrabModeAsync, GrabModeAsync);
-    XGrabKey(display, keyWorkspace1(), defaultModifier(), root, True, GrabModeAsync, GrabModeAsync);
-    XGrabKey(display, keyWorkspace2(), defaultModifier(), root, True, GrabModeAsync, GrabModeAsync);
+
+    for (int i = 0; i < workspaceCount; ++i)
+        XGrabKey(display, keyWorkspace(i), defaultModifier(), root, True, GrabModeAsync, GrabModeAsync);
 }
 
 KeyGrabber::~KeyGrabber() {
@@ -20,20 +22,18 @@ KeyGrabber::~KeyGrabber() {
 
     XUngrabKey(display, keyDMenu(), defaultModifier(), root);
     XUngrabKey(display, keyClose(), defaultModifier()|ShiftMask, root);
-    XUngrabKey(display, keyWorkspace1(), defaultModifier(), root);
-    XUngrabKey(display, keyWorkspace2(), defaultModifier(), root);
+
+    for (int i = 0; i < workspaceCount; ++i)
+        XUngrabKey(display, keyWorkspace(i), defaultModifier(), root);
 }
 
 int KeyGrabber::defaultModifier() {
     return Mod4Mask;
 }
 
-int KeyGrabber::keyWorkspace1() {
-    return XKeysymToKeycode(display, XStringToKeysym("1"));
-}
-
-int KeyGrabber::keyWorkspace2() {
-    return XKeysymToKeycode(display, XStringToKeysym("2"));
+int KeyGrabber::keyWorkspace(int number) {
+    const char* const workspaceKeys[] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"};
+    return XKeysymToKeycode(display, XStringToKeysym(workspaceKeys[number]));
 }
 
 int KeyGrabber::keyClose() {

@@ -33,16 +33,19 @@ void WindowManager::onKeyPress() {
                 currentWindow = 0; // @TODO: Select next window by mouse position
             }
         } else {
-            if (event.xkey.keycode == keyGrabber->keyWorkspace1()) {
-                addDebugText("WORKSPACE 1");
-                changeWorkspace(0);
-            } else if (event.xkey.keycode == keyGrabber->keyWorkspace2()) {
-                addDebugText("WORKSPACE 2");
-                changeWorkspace(1);
-            } else if (event.xkey.keycode == keyGrabber->keyDMenu()) {
+            if (event.xkey.keycode == keyGrabber->keyDMenu()) {
                 addDebugText("DMENU SPAWN");
                 char *const parmList[] = {(char *) "dmenu_run", 0};
                 spawn("/usr/bin/dmenu_run", parmList);
+            } else {
+                for (int i = 0; i < workspaceCount(); ++i) {
+                    if (event.xkey.keycode == keyGrabber->keyWorkspace(i)) {
+                        stringstream ss;
+                        ss << "WORKSPACE " << (i+1);
+                        addDebugText(ss.str());
+                        changeWorkspace(i);
+                    }
+                }
             }
         }
     }

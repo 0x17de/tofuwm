@@ -3,6 +3,7 @@
 
 #include <list>
 #include <map>
+#include <vector>
 #include <memory>
 #include <X11/Xlib.h>
 #include "keygrabber.h"
@@ -49,7 +50,7 @@ private:
     std::shared_ptr<WmContainer> rootContainer;
 
     // Workspaces
-    Workspace workspaces[2];
+    std::vector<Workspace> workspaces;
     Workspace* currentWorkspace;
 
     // === Methods
@@ -66,6 +67,7 @@ private:
     void setCurrentWindow(Window window);
     WmWindow* addWindow(Window window);
     WmWindow* findWindow(Window window);
+    static inline constexpr int workspaceCount() { return 10; }
 
     // === Debug
     void printDebugText();

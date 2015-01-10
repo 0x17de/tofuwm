@@ -12,14 +12,15 @@
 using namespace std;
 
 
-WindowManager::WindowManager()
+WindowManager::WindowManager() :
+workspaces(workspaceCount())
 {
     displayPtr = shared_ptr<Display>(XOpenDisplay(0), Free_XCloseDisplay());
     if (!displayPtr) throw runtime_error("Display is not open");
     display = displayPtr.get();
     root = XDefaultRootWindow(display);
 
-    keyGrabber = make_shared<KeyGrabber>(display);
+    keyGrabber = make_shared<KeyGrabber>(display, workspaceCount());
     fontHelper = make_shared<FontHelper>(display);
 
     currentWorkspace = &workspaces[0];
