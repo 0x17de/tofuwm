@@ -37,6 +37,7 @@ void WindowManager::initBackground() {
 void WindowManager::run() {
     // @TODO: Scan and add initially existing windows. Then set default event mask.
     initBackground();
+    calculateDesktopSpace();
     loop();
 }
 
@@ -64,7 +65,7 @@ void WindowManager::calculateDesktopSpace() {
 
     Geometry& d = desktop;
     d.x = rAttr.x;
-    d.y = rAttr.x;
+    d.y = rAttr.y;
     d.w = rAttr.width;
     d.h = rAttr.height;
 
@@ -120,11 +121,9 @@ void WindowManager::spawn(const std::string& cmd, char *const argv[]) {
 }
 
 WmWindow* WindowManager::findWindow(Window window) {
-    cout << "TryFind " << hex << window << endl;
     auto it = windows.find(window);
     if (it == windows.end())
         return 0;
-    cout << "Found " << endl;
     return it->second.get();
 }
 

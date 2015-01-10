@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include <cmath>
 #include <X11/Xlib.h>
 #include "windowmanager.h"
@@ -15,6 +16,16 @@ void WindowManager::onMapRequest() {
     w->setWorkspace(currentWorkspace);
     currentWorkspace->addWindow(w.get());
     w->setDefaultEventMask();
+
+    stringstream ss;
+    ss << desktop.x << ":" << desktop.w << ":" << desktop.y << ":" << desktop.h;
+    addDebugText(ss.str());
+
+    XWindowAttributes attributes;
+    XGetWindowAttributes(displayPtr.get(), w->frame, &attributes);
+    w->relocate(desktop.x + (desktop.w - attributes.width)/2,
+                desktop.y + (desktop.h - attributes.height)/2,
+                attributes.width, attributes.height);
 
     XMapWindow(displayPtr.get(), w->window);
     w->show();
@@ -76,8 +87,6 @@ void WindowManager::onButtonRelease() {
 }
 
 void WindowManager::onEnter() {
-    cout << "ENTER WIN " << hex << event.xcrossing.window << endl;
-    cout << "ENTER SUB " << hex << event.xcrossing.subwindow << endl;
     setCurrentWindow(event.xcrossing.window);
     currentWindow->setActive(true);
 }
