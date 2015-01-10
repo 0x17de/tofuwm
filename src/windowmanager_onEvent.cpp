@@ -42,12 +42,6 @@ void WindowManager::onKeyPress() {
             }
         }
     }
-
-    // @TODO: raise windows
-    /* if (event.xkey.subwindow != None) {
-        XRaiseWindow(display, event.xkey.subwindow);
-        cout << "Raise" << endl;
-    } */
 }
 
 void WindowManager::onKeyRelease() {
@@ -58,6 +52,7 @@ void WindowManager::onButtonPress() {
         if (event.xbutton.subwindow != None) {
             XGetWindowAttributes(displayPtr.get(), event.xbutton.subwindow, &moveWindowAttributes);
             moveWindowStart = event.xbutton;
+            XRaiseWindow(displayPtr.get(), event.xbutton.subwindow);
             if (moveWindowStart.button == 3) { // Right mouse
                 moveWindowExpandXPositive = moveWindowStart.x_root >= moveWindowAttributes.x + moveWindowAttributes.width / 2;
                 moveWindowExpandYPositive = moveWindowStart.y_root >= moveWindowAttributes.y + moveWindowAttributes.height / 2;
