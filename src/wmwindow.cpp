@@ -42,8 +42,11 @@ void WmWindow::setActive(bool active) {
     XClearWindow(display, frame);
 }
 
-void WmWindow::setWorkspace(Workspace* workspace) {
-    this->workspace = workspace;
+void WmWindow::setWorkspace(Workspace* newWorkspace) {
+    if (workspace)
+        workspace->removeWindow(this);
+    workspace = newWorkspace;
+    workspace->addWindow(this);
 }
 
 bool WmWindow::staysFloating() {

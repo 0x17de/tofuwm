@@ -14,7 +14,6 @@ void WindowManager::onMapRequest() {
     windows.insert(make_pair(w->frame, w));
 
     w->setWorkspace(currentWorkspace);
-    currentWorkspace->addWindow(w.get());
     w->setDefaultEventMask();
 
     stringstream ss;

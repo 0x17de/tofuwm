@@ -20,7 +20,7 @@ public:
     void show();
     void hide();
     void setActive(bool active);
-    void setWorkspace(Workspace* workspace);
+    void setWorkspace(Workspace* newWorkspace);
     bool staysFloating();
     void toggleFloating();
     Atom getAtom(const std::string& protocol);

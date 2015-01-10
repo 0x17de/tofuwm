@@ -55,6 +55,8 @@ void WindowManager::changeWorkspace(int number) {
 
     currentWorkspace->hide();
     currentWorkspace = &workspaces[number];
+    if (moveWindow)
+        moveWindow->setWorkspace(currentWorkspace);
     currentWorkspace->show();
     // @TODO: Select currentWindow by mouse position
 }
