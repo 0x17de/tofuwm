@@ -6,11 +6,17 @@ set(EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 
 find_package(X11 REQUIRED)
 
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(SOURCE_FILES
     src/main.cpp
+    src/windowmanager/windowmanager.cpp src/windowmanager/windowmanager.h
+    src/windowmanager/windowmanager_debug.cpp
+    src/windowmanager/windowmanager_init.cpp
+    src/windowmanager/windowmanager_eventloop.cpp
+    src/windowmanager/windowmanager_onEvent.cpp
+    src/windowmanager/windowmanager_onInput.cpp
+    src/windowmanager/windowmanager_onNotify.cpp
     src/keygrabber.cpp src/keygrabber.h
-    src/windowmanager.cpp src/windowmanager.h
-    src/windowmanager_onEvent.cpp src/windowmanager_onInput.cpp src/windowmanager_onNotify.cpp
     src/display.h
     src/workspace.cpp src/workspace.h
     src/fonthelper.cpp src/fonthelper.h

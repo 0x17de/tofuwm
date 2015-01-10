@@ -1,6 +1,6 @@
 #include <iostream>
 #include <stdexcept>
-#include "windowmanager.h"
+#include "windowmanager/windowmanager.h"
 
 
 using namespace std;
