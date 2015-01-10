@@ -32,6 +32,7 @@ private:
     bool moveWindowExpandYPositive;
 
     // Default
+    Cursor cursor;
     XEvent event;
 
     std::shared_ptr<Display> displayPtr;
@@ -46,6 +47,7 @@ private:
     Workspace* currentWorkspace;
 
     // === Methods
+    void initCursor();
     void initBackground();
     void changeWorkspace(int number);
     void loop();

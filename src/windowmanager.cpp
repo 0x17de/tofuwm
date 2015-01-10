@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cassert>
 #include <X11/Xlib.h>
+#include <X11/cursorfont.h>
 #include <unistd.h>
 #include <sstream>
 
@@ -26,6 +27,11 @@ WindowManager::~WindowManager() {
 
 }
 
+void WindowManager::initCursor() {
+    cursor = XCreateFontCursor(displayPtr.get(), XC_arrow);
+    XDefineCursor(displayPtr.get(), root, cursor);
+}
+
 void WindowManager::initBackground() {
     Display *display = displayPtr.get();
 
@@ -36,6 +42,7 @@ void WindowManager::initBackground() {
 
 void WindowManager::run() {
     // @TODO: Scan and add initially existing windows. Then set default event mask.
+    initCursor();
     initBackground();
     calculateDesktopSpace();
     loop();
