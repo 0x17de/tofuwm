@@ -89,13 +89,25 @@ int WmWindow::minWindowSize() {
 }
 
 void WmWindow::resize(int w, int h) {
-    XResizeWindow(wm->display, frame, max(minWindowSize()+4, w), max(minWindowSize()+4, h));
-    XResizeWindow(wm->display, window, max(minWindowSize(), w-4), max(minWindowSize(), h-4));
+    XWindowChanges xchanges;
+    xchanges.width = max(minWindowSize(), w);
+    xchanges.height = max(minWindowSize(), h);
+    XConfigureWindow(wm->display, window, CWWidth|CWHeight, &xchanges);
+    xchanges.width += 4;
+    xchanges.height += 4;
+    XConfigureWindow(wm->display, frame, CWWidth|CWHeight, &xchanges);
 }
 
 void WmWindow::relocate(int x, int y, int w, int h) {
-    XMoveResizeWindow(wm->display, frame, x, y, max(minWindowSize()+4, w), max(minWindowSize()+4, h));
-    XResizeWindow(wm->display, window, max(minWindowSize(), w-4), max(minWindowSize(), h-4));
+    XWindowChanges xchanges;
+    xchanges.width = max(minWindowSize(), w);
+    xchanges.height = max(minWindowSize(), h);
+    XConfigureWindow(wm->display, window, CWWidth|CWHeight, &xchanges);
+    xchanges.x = x;
+    xchanges.y = y;
+    xchanges.width += 4;
+    xchanges.height += 4;
+    XConfigureWindow(wm->display, frame, CWX|CWY|CWWidth|CWHeight, &xchanges);
 }
 
 void WmWindow::close() {

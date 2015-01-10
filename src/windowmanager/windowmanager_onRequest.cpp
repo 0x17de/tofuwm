@@ -16,14 +16,16 @@ void WindowManager::onMapRequest() {
 }
 
 void WindowManager::onConfigureRequest() { // @TODO: fix window jumping
-    if (event.xconfigurerequest.window && !moveWindow/*@HOTFIX*/) {
+    if (event.xconfigurerequest.window) {
         stringstream ss;
         ss << "CONFIG WND " << event.xconfigurerequest.window;
         addDebugText(ss.str());
 
         WmWindow* w = findWindow(event.xconfigurerequest.window);
-        if (w && w->window == event.xconfigurerequest.window)
+        if (w && w->window == event.xconfigurerequest.window) {
+            addDebugText("ConfigureRequest - would relocate");
             w->relocate(event.xconfigurerequest.x - 2, event.xconfigurerequest.y - 2, event.xconfigurerequest.width + 4, event.xconfigurerequest.height + 4);
+        }
     }
 }
 

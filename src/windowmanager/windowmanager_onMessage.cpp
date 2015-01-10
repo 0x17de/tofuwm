@@ -29,10 +29,13 @@ void WindowManager::onClientMessage() {
     static Atom A__NET_REQUEST_FRAME_EXTENTS = getAtom("_NET_REQUEST_FRAME_EXTENTS");
 
     if (A__NET_WM_STATE == event.xclient.message_type) {
+        addDebugText("onNetWmState");
         onNetWmState();
     } else if (A__NET_REQUEST_FRAME_EXTENTS == event.xclient.message_type) {
+        addDebugText("onNetRequestFrameExtents");
         onNetRequestFrameExtents();
     } else if (A__NET_ACTIVE_WINDOW == event.xclient.message_type) {
+        addDebugText("onNetRequestActiveWindow");
         onNetRequestActiveWindow();
     } else {
         debugPrintUnknownAtom(event.xclient.message_type);

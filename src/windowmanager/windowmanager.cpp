@@ -56,15 +56,17 @@ WmWindow* WindowManager::addWindow(Window window) {
 
     XWindowAttributes attributes;
     XGetWindowAttributes(display, w->frame, &attributes);
-    w->relocate(desktop.x + (desktop.w - attributes.width) / 2,
-            desktop.y + (desktop.h - attributes.height) / 2,
-            attributes.width, attributes.height);
 
     w->selectDefaultInput();
     w->setDefaultEventMask();
     w->show();
 
-    currentWindow = w;
+    if (currentWindow == 0)
+        currentWindow = w;
+
+    w->relocate(desktop.x + (desktop.w - attributes.width) / 2,
+            desktop.y + (desktop.h - attributes.height) / 2,
+            attributes.width, attributes.height);
 
     return w;
 }
