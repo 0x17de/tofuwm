@@ -24,7 +24,7 @@ void WindowManager::onConfigureRequest() { // @TODO: fix window jumping
         WmWindow* w = findWindow(event.xconfigurerequest.window);
         if (w && w->window == event.xconfigurerequest.window) {
             addDebugText("ConfigureRequest - would relocate");
-            w->relocate(event.xconfigurerequest.x - 2, event.xconfigurerequest.y - 2, event.xconfigurerequest.width + 4, event.xconfigurerequest.height + 4);
+            w->relocate(event.xconfigurerequest.x, event.xconfigurerequest.y, event.xconfigurerequest.width, event.xconfigurerequest.height);
         }
     }
 }
