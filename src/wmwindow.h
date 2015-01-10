@@ -19,6 +19,7 @@ public:
 
     void show();
     void hide();
+    int minWindowSize();
     void setActive(bool active);
     void setWorkspace(Workspace* newWorkspace);
     bool staysFloating();
@@ -26,6 +27,8 @@ public:
     Atom getAtom(const std::string& protocol);
     bool supportsProtocol(Atom protocol) throw ();
     void close();
+    void selectNoInput();
+    void selectDefaultInput();
     void setDefaultEventMask();
 
     void resize(int w, int h);

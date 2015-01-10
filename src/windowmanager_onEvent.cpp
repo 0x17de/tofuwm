@@ -9,28 +9,32 @@ using namespace std;
 
 
 void WindowManager::onMapRequest() {
-    shared_ptr <WmWindow> w(make_shared<WmWindow>(display, root, event.xmaprequest.window));
-    windows.insert(make_pair(w->window, w));
-    windows.insert(make_pair(w->frame, w));
+    if (event.xmaprequest.parent == root) {
+        shared_ptr<WmWindow> w(make_shared<WmWindow>(display, root, event.xmaprequest.window));
+        windows.insert(make_pair(w->window, w));
+        windows.insert(make_pair(w->frame, w));
 
-    w->setWorkspace(currentWorkspace);
-    w->setDefaultEventMask();
+        w->setWorkspace(currentWorkspace);
 
-    stringstream ss;
-    ss << desktop.x << ":" << desktop.w << ":" << desktop.y << ":" << desktop.h;
-    addDebugText(ss.str());
+        stringstream ss;
+        ss << desktop.x << ":" << desktop.w << ":" << desktop.y << ":" << desktop.h;
+        addDebugText(ss.str());
 
-    XWindowAttributes attributes;
-    XGetWindowAttributes(display, w->frame, &attributes);
-    w->relocate(desktop.x + (desktop.w - attributes.width)/2,
-                desktop.y + (desktop.h - attributes.height)/2,
+        XWindowAttributes attributes;
+        XGetWindowAttributes(display, w->frame, &attributes);
+        w->relocate(desktop.x + (desktop.w - attributes.width) / 2,
+                desktop.y + (desktop.h - attributes.height) / 2,
                 attributes.width, attributes.height);
 
-    XMapWindow(display, w->window);
-    w->show();
+        w->show();
+        w->selectDefaultInput();
+        w->setDefaultEventMask();
 
-    if (currentWindow == 0)
-        currentWindow = w.get();
+        if (currentWindow == 0)
+            currentWindow = w.get();
+    } else {
+        XMapWindow(display, event.xmaprequest.window);
+    }
 }
 
 void WindowManager::onKeyPress() {
@@ -86,12 +90,15 @@ void WindowManager::onButtonRelease() {
 }
 
 void WindowManager::onEnter() {
+    if (moveWindow)
+        return;
+
     setCurrentWindow(event.xcrossing.window);
     currentWindow->setActive(true);
 }
 
 void WindowManager::onLeave() {
-    if (!currentWindow)
+    if (!currentWindow || moveWindow)
         return;
 
     currentWindow->setActive(false);

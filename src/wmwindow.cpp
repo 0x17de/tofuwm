@@ -81,14 +81,18 @@ bool WmWindow::supportsProtocol(Atom protocol) throw () {
     return found;
 }
 
+int WmWindow::minWindowSize() {
+    return 5;
+}
+
 void WmWindow::resize(int w, int h) {
-    XResizeWindow(display, frame, max(1, w), max(1, h));
-    XResizeWindow(display, window, max(1, w-4), max(1, h-4));
+    XResizeWindow(display, frame, max(minWindowSize(), w), max(minWindowSize(), h));
+    XResizeWindow(display, window, max(minWindowSize(), w-4), max(minWindowSize(), h-4));
 }
 
 void WmWindow::relocate(int x, int y, int w, int h) {
-    XMoveResizeWindow(display, frame, x, y, max(1, w), max(1, h));
-    XMoveResizeWindow(display, window, 2, 2, max(1, w-4), max(1, h-4));
+    XMoveResizeWindow(display, frame, x, y, max(minWindowSize(), w), max(minWindowSize(), h));
+    XMoveResizeWindow(display, window, 2, 2, max(minWindowSize(), w-4), max(minWindowSize(), h-4));
 }
 
 void WmWindow::close() {
@@ -111,15 +115,29 @@ void WmWindow::close() {
     XSendEvent(display, window, false, 0, (XEvent*) &xevent);
 }
 
+void WmWindow::selectNoInput() {
+    XSetWindowAttributes attributes;
+
+    attributes.event_mask = 0;
+    XChangeWindowAttributes(display, frame, CWEventMask, &attributes);
+}
+
+void WmWindow::selectDefaultInput() {
+    XSetWindowAttributes attributes;
+
+    attributes.event_mask = SubstructureRedirectMask;
+    attributes.override_redirect = 1;
+    XChangeWindowAttributes(display, frame, CWOverrideRedirect | CWEventMask, &attributes);
+}
+
 void WmWindow::setDefaultEventMask() {
     XSetWindowAttributes attributes;
 
     attributes.event_mask = StructureNotifyMask | EnterWindowMask | LeaveWindowMask;
     XChangeWindowAttributes(display, window, CWEventMask, &attributes);
 
-    attributes.event_mask = SubstructureRedirectMask;
     attributes.override_redirect = 1;
-    XChangeWindowAttributes(display, frame, CWOverrideRedirect | CWEventMask, &attributes);
+    XChangeWindowAttributes(display, frame, CWOverrideRedirect, &attributes);
 }
 
 bool WmWindow::operator==(const Window& window) {

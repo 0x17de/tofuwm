@@ -51,6 +51,9 @@ private:
     // === Methods
     void initCursor();
     void initBackground();
+    void selectInput(int mask);
+    void selectNoInput();
+    void selectDefaultInput();
     void changeWorkspace(int number);
     void loop();
     void calculateDesktopSpace();

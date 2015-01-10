@@ -22,7 +22,7 @@ WindowManager::WindowManager()
     keyGrabber = make_shared<KeyGrabber>(display);
     fontHelper = make_shared<FontHelper>(display);
 
-    XSelectInput(display, root, ResizeRedirectMask | SubstructureRedirectMask);
+    selectDefaultInput();
     currentWorkspace = &workspaces[0];
 }
 
@@ -39,6 +39,18 @@ void WindowManager::initBackground() {
     XSetWindowBackground(display, root, 0xc0c0c0);
     XClearWindow(display, root);
     XFlush(display);
+}
+
+void WindowManager::selectInput(int mask) {
+    XSelectInput(display, root, mask);
+}
+
+void WindowManager::selectNoInput() {
+    selectInput(0);
+}
+
+void WindowManager::selectDefaultInput() {
+    selectInput(ResizeRedirectMask | SubstructureRedirectMask);
 }
 
 void WindowManager::run() {
