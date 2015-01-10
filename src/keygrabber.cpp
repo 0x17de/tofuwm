@@ -6,25 +6,17 @@ KeyGrabber::KeyGrabber(Display* display, int workspaceCount)
     root(DefaultRootWindow(display)),
     workspaceCount(workspaceCount)
 {
-    XGrabButton(display, 1, defaultModifier(), root, True, ButtonPressMask|ButtonReleaseMask|PointerMotionMask, GrabModeAsync, GrabModeAsync, None, None);
-    XGrabButton(display, 3, defaultModifier(), root, True, ButtonPressMask|ButtonReleaseMask|PointerMotionMask, GrabModeAsync, GrabModeAsync, None, None);
+    hotbuttons.emplace_back(display, root, 1, defaultModifier(), ButtonPressMask|ButtonReleaseMask|PointerMotionMask);
+    hotbuttons.emplace_back(display, root, 3, defaultModifier(), ButtonPressMask|ButtonReleaseMask|PointerMotionMask);
 
-    XGrabKey(display, keyDMenu(), defaultModifier(), root, True, GrabModeAsync, GrabModeAsync);
-    XGrabKey(display, keyClose(), defaultModifier()|ShiftMask, root, True, GrabModeAsync, GrabModeAsync);
+    hotkeys.emplace_back(display, root, keyDMenu(), defaultModifier());
+    hotkeys.emplace_back(display, root, keyClose(), defaultModifier()|ShiftMask);
 
     for (int i = 0; i < workspaceCount; ++i)
-        XGrabKey(display, keyWorkspace(i), defaultModifier(), root, True, GrabModeAsync, GrabModeAsync);
+        hotkeys.emplace_back(display, root, keyWorkspace(i), defaultModifier());
 }
 
 KeyGrabber::~KeyGrabber() {
-    XUngrabButton(display, 1, defaultModifier(), root);
-    XUngrabButton(display, 3, defaultModifier(), root);
-
-    XUngrabKey(display, keyDMenu(), defaultModifier(), root);
-    XUngrabKey(display, keyClose(), defaultModifier()|ShiftMask, root);
-
-    for (int i = 0; i < workspaceCount; ++i)
-        XUngrabKey(display, keyWorkspace(i), defaultModifier(), root);
 }
 
 int KeyGrabber::defaultModifier() {

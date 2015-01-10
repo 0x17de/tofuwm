@@ -17,6 +17,7 @@ set(SOURCE_FILES
     src/windowmanager/windowmanager_onInput.cpp
     src/windowmanager/windowmanager_onNotify.cpp
     src/keygrabber.cpp src/keygrabber.h
+    src/wmhotkey.cpp src/wmhotkey.h
     src/display.h
     src/workspace.cpp src/workspace.h
     src/fonthelper.cpp src/fonthelper.h
