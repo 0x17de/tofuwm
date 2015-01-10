@@ -36,6 +36,7 @@ private:
     XEvent event;
 
     std::shared_ptr<Display> displayPtr;
+    Display* display;
     std::shared_ptr<KeyGrabber> keyGrabber;
     std::shared_ptr<FontHelper> fontHelper;
 

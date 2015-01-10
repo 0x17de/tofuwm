@@ -9,7 +9,7 @@ using namespace std;
 
 
 void WindowManager::onMapRequest() {
-    shared_ptr <WmWindow> w(make_shared<WmWindow>(displayPtr.get(), root, event.xmaprequest.window));
+    shared_ptr <WmWindow> w(make_shared<WmWindow>(display, root, event.xmaprequest.window));
     windows.insert(make_pair(w->window, w));
     windows.insert(make_pair(w->frame, w));
 
@@ -21,12 +21,12 @@ void WindowManager::onMapRequest() {
     addDebugText(ss.str());
 
     XWindowAttributes attributes;
-    XGetWindowAttributes(displayPtr.get(), w->frame, &attributes);
+    XGetWindowAttributes(display, w->frame, &attributes);
     w->relocate(desktop.x + (desktop.w - attributes.width)/2,
                 desktop.y + (desktop.h - attributes.height)/2,
                 attributes.width, attributes.height);
 
-    XMapWindow(displayPtr.get(), w->window);
+    XMapWindow(display, w->window);
     w->show();
 
     if (currentWindow == 0)
@@ -69,9 +69,9 @@ void WindowManager::onButtonPress() {
                 return;
             currentWindow = moveWindow;
             currentWindow->setActive(true);
-            XGetWindowAttributes(displayPtr.get(), moveWindow->frame, &moveWindowAttributes);
+            XGetWindowAttributes(display, moveWindow->frame, &moveWindowAttributes);
             moveWindowStart = event.xbutton;
-            XRaiseWindow(displayPtr.get(), moveWindow->frame);
+            XRaiseWindow(display, moveWindow->frame);
             if (moveWindowStart.button == 3) { // Right mouse
                 moveWindowExpandXPositive = moveWindowStart.x_root >= moveWindowAttributes.x + moveWindowAttributes.width / 2;
                 moveWindowExpandYPositive = moveWindowStart.y_root >= moveWindowAttributes.y + moveWindowAttributes.height / 2;

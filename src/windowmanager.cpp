@@ -16,12 +16,13 @@ WindowManager::WindowManager()
 {
     displayPtr = shared_ptr<Display>(XOpenDisplay(0), Free_XCloseDisplay());
     if (!displayPtr) throw runtime_error("Display is not open");
-    root = XDefaultRootWindow(displayPtr.get());
+    display = displayPtr.get();
+    root = XDefaultRootWindow(display);
 
-    keyGrabber = make_shared<KeyGrabber>(displayPtr.get());
-    fontHelper = make_shared<FontHelper>(displayPtr.get());
+    keyGrabber = make_shared<KeyGrabber>(display);
+    fontHelper = make_shared<FontHelper>(display);
 
-    XSelectInput(displayPtr.get(), root, SubstructureRedirectMask);
+    XSelectInput(display, root, SubstructureRedirectMask);
     currentWorkspace = &workspaces[0];
 }
 
@@ -30,12 +31,12 @@ WindowManager::~WindowManager() {
 }
 
 void WindowManager::initCursor() {
-    cursor = XCreateFontCursor(displayPtr.get(), XC_arrow);
-    XDefineCursor(displayPtr.get(), root, cursor);
+    cursor = XCreateFontCursor(display, XC_arrow);
+    XDefineCursor(display, root, cursor);
 }
 
 void WindowManager::initBackground() {
-    Display *display = displayPtr.get();
+    Display *display = display;
 
     XSetWindowBackground(display, root, 0xc0c0c0);
     XClearWindow(display, root);
@@ -72,7 +73,7 @@ void WindowManager::changeWorkspace(int number) {
 
 void WindowManager::calculateDesktopSpace() {
     XWindowAttributes rAttr;
-    XGetWindowAttributes(displayPtr.get(), root, &rAttr);
+    XGetWindowAttributes(display, root, &rAttr);
 
     Geometry& d = desktop;
     d.x = rAttr.x;
@@ -82,7 +83,7 @@ void WindowManager::calculateDesktopSpace() {
 
     for (shared_ptr<WmWindow>& w : dockedWindows) {
         XWindowAttributes wAttr;
-        XGetWindowAttributes(displayPtr.get(), w->window, &wAttr);
+        XGetWindowAttributes(display, w->window, &wAttr);
 
         if (wAttr.x == 0 && wAttr.width < rAttr.width
          && wAttr.width > d.x) {
@@ -110,14 +111,14 @@ void WindowManager::addDebugText(const std::string& text) {
 }
 
 void WindowManager::printDebugText() {
-    GC gc = XDefaultGC(displayPtr.get(), XDefaultScreen(displayPtr.get()));
+    GC gc = XDefaultGC(display, XDefaultScreen(display));
     fontHelper->setFont(gc);
 
-    XClearWindow(displayPtr.get(), root);
+    XClearWindow(display, root);
 
     int y = 40;
     for (string &text : debugStrings) {
-        XDrawString(displayPtr.get(), root, gc, 20, y, text.c_str(), text.length());
+        XDrawString(display, root, gc, 20, y, text.c_str(), text.length());
         y += 16;
     }
 }
@@ -139,7 +140,7 @@ WmWindow* WindowManager::findWindow(Window window) {
 }
 
 void WindowManager::loop() {
-    Display *display = displayPtr.get();
+    Display *display = display;
     // Loop
     printDebugText();
     while(running) {
