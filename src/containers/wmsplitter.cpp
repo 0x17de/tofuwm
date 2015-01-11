@@ -48,7 +48,7 @@ void WmSplitter::relocate(int x, int y, int width, int height) {
             subHeight = height * splitRatio;
         } else {
             subWidth = width * splitRatio;
-            subHeight = y;
+            subHeight = height;
         }
 
         Geometry& g = child->geometry();
