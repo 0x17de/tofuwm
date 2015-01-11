@@ -14,11 +14,22 @@
 #include "geometry.h"
 
 
+enum class LogLevel {
+    Silent = 0,
+    Critical = 1,
+    Warning = 2,
+    Info = 4,
+    Verbose = 4,
+    VeryVerbose = 5
+};
+
+
 class WindowManager {
 private:
     bool running = true;
     std::list<std::string> debugStrings;
     std::string wmname = "tofuwm";
+    LogLevel currentLogLevel = LogLevel::Warning;
 
     std::shared_ptr<Display> displayPtr;
 public:
@@ -82,8 +93,8 @@ private:
     // === Debug
 public:
     void printDebugText();
-    void addDebugText(const std::string& text);
-    void debugPrintUnknownAtom(Atom atom) throw();
+    void addDebugText(const std::string& text, LogLevel level);
+    void debugPrintUnknownAtom(Atom atom, LogLevel level) throw();
 private:
     // === Events & Notifications
     void onMotion();

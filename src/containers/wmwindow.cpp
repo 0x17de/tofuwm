@@ -17,13 +17,21 @@ WmWindow::WmWindow(WindowManager* wm, Window window) :
     XGetWindowAttributes(wm->display, window, &wAttr);
 
     frame = XCreateSimpleWindow(wm->display, wm->root, wAttr.x - 2, wAttr.y - 2, wAttr.width + 4, wAttr.height + 4, 0, 0, 0xff00ff);
-    XReparentWindow(wm->display, window, frame, 2, 2);
+
+    // No event during remapping
+    XSetWindowAttributes attributes;
+    attributes.override_redirect = 1;
+    attributes.event_mask = 0;
+    XChangeWindowAttributes(wm->display, frame, CWEventMask | CWOverrideRedirect, &attributes);
+
     XMapWindow(wm->display, frame);
+    XReparentWindow(wm->display, window, frame, 2, 2);
     isMapped = true;
+
+    setDefaultEventMask();
 }
 
 WmWindow::~WmWindow() {
-    selectNoInput();
     XWindowAttributes wAttr;
     XGetWindowAttributes(wm->display, frame, &wAttr);
     if (window && isMapped)
@@ -50,14 +58,6 @@ void WmWindow::show() {
 void WmWindow::setActive(bool active) {
     XSetWindowBackground(wm->display, frame, active ? 0x00ff00 : 0xff0000);
     XClearWindow(wm->display, frame);
-}
-
-bool WmWindow::staysFloating() {
-    return staysFloating_;
-}
-
-void WmWindow::toggleFloating() {
-    staysFloating_ = !staysFloating_;
 }
 
 bool WmWindow::supportsProtocol(Atom protocol) throw () {
@@ -96,16 +96,14 @@ void WmWindow::resize(int w, int h) {
 }
 
 void WmWindow::realign() {
-    selectNoInput();
     Geometry& g = geometry();
     relocate(g.x, g.y, g.w, g.h);
-    selectDefaultInput();
 }
 
 void WmWindow::relocate(int x, int y, int w, int h, unsigned int event_mask) {
     stringstream ss;
     ss << "RELOC " << window << ": " << x << ":" << y << ":" << w << ":" << h;
-    wm->addDebugText(ss.str());
+    wm->addDebugText(ss.str(), LogLevel::Verbose);
 
     // We don't care about other masks
     event_mask &= CWX | CWY | CWWidth | CWHeight;
@@ -150,28 +148,14 @@ void WmWindow::close() {
     XSendEvent(wm->display, window, false, 0, (XEvent*) &xevent);
 }
 
-void WmWindow::selectNoInput() {
-    XSetWindowAttributes attributes;
-
-    attributes.event_mask = 0;
-    XChangeWindowAttributes(wm->display, frame, CWEventMask, &attributes);
-}
-
-void WmWindow::selectDefaultInput() {
-    XSetWindowAttributes attributes;
-
-    attributes.event_mask = SubstructureRedirectMask;
-    XChangeWindowAttributes(wm->display, frame, CWEventMask, &attributes);
-}
-
 void WmWindow::setDefaultEventMask() {
     XSetWindowAttributes attributes;
 
-    attributes.event_mask = StructureNotifyMask | EnterWindowMask | LeaveWindowMask;
+    attributes.event_mask = PropertyChangeMask | StructureNotifyMask;
     XChangeWindowAttributes(wm->display, window, CWEventMask, &attributes);
 
-    attributes.override_redirect = 1;
-    XChangeWindowAttributes(wm->display, frame, CWOverrideRedirect, &attributes);
+    attributes.event_mask = EnterWindowMask | LeaveWindowMask | SubstructureRedirectMask;
+    XChangeWindowAttributes(wm->display, frame, CWEventMask, &attributes);
 }
 
 bool WmWindow::operator==(const Window& window) {

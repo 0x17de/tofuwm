@@ -80,7 +80,6 @@ void WindowManager::onMousePress() {
             return;
         }
 
-        moveWindow->selectNoInput();
         setCurrentWindow(moveWindow);
         XGetWindowAttributes(display, moveWindow->frame, &moveWindowAttributes);
         moveWindowStart = event.xbutton;
@@ -97,7 +96,6 @@ void WindowManager::onMousePress() {
 
 void WindowManager::onMouseRelease() {
     if (moveWindow) {
-        moveWindow->selectDefaultInput();
         moveWindowStart.subwindow = None;
         moveWindow = nullptr;
     }
@@ -110,7 +108,7 @@ void WindowManager::onMouseMotion() {
         if (moveWindowStart.button == 1) { // Left mouse
             moveWindow->relocate(moveWindowAttributes.x + xdiff, moveWindowAttributes.y + ydiff, moveWindowAttributes.width, moveWindowAttributes.height);
         } else if (moveWindowStart.button == 3) { // Right mouse
-            moveWindow->relocate(moveWindowAttributes.x + (moveWindowExpandXPositive ? 0 : xdiff), moveWindowAttributes.y + (moveWindowExpandYPositive ? 0 : ydiff),
+            moveWindow->relocate(moveWindowAttributes.x + (moveWindowExpandXPositive ? 0 : min(xdiff, moveWindowAttributes.width)), moveWindowAttributes.y + (moveWindowExpandYPositive ? 0 : min(ydiff, moveWindowAttributes.height)),
                     moveWindowAttributes.width + (moveWindowExpandXPositive ? xdiff : -xdiff), moveWindowAttributes.height + (moveWindowExpandYPositive ? ydiff : -ydiff));
         }
     }

@@ -43,7 +43,7 @@ workspaceCount(workspaceCount)
     hotkeys.emplace_back(wm->display, wm->root,
             key("d"), defaultModifier,
             [=] {
-                wm->addDebugText("DMENU SPAWN");
+                wm->addDebugText("DMENU SPAWN", LogLevel::Verbose);
                 char *const parmList[] = {(char *) "dmenu_run", 0};
                 wm->spawn("/usr/bin/dmenu_run", parmList);
             }, nullptr);
@@ -51,7 +51,7 @@ workspaceCount(workspaceCount)
     hotkeys.emplace_back(wm->display, wm->root,
             key("t"), defaultModifier,
             [=] {
-                wm->addDebugText("DMENU SPAWN");
+                wm->addDebugText("GEDIT SPAWN", LogLevel::Verbose);
                 char *const parmList[] = {(char *) "gedit", (char*) "--new-window", 0};
                 wm->spawn("/usr/bin/gedit", parmList);
             }, nullptr);
@@ -59,7 +59,7 @@ workspaceCount(workspaceCount)
     hotkeys.emplace_back(wm->display, wm->root,
             key("q"), defaultModifier | ShiftMask,
             [=] {
-                wm->addDebugText("WINDOW CLOSE");
+                wm->addDebugText("WINDOW CLOSE", LogLevel::Verbose);
                 if (wm->currentWindow)
                     wm->currentWindow->close();
                 wm->selectNewCurrentWindow();
@@ -72,7 +72,7 @@ workspaceCount(workspaceCount)
                 [=] {
                     stringstream ss;
                     ss << "WORKSPACE " << (i+1);
-                    wm->addDebugText(ss.str());
+                    wm->addDebugText(ss.str(), LogLevel::Verbose);
                     wm->changeWorkspace(i);
                 }, nullptr);
     }

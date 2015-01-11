@@ -9,15 +9,21 @@
 using namespace std;
 
 
-void WindowManager::debugPrintUnknownAtom(Atom atom) throw() {
+void WindowManager::debugPrintUnknownAtom(Atom atom, LogLevel level) throw() {
+    if (level > currentLogLevel)
+        return;
+
     char* name = XGetAtomName(display, atom);
     stringstream ss;
     ss << "UnkCMsg ATOM " << name;
-    addDebugText(ss.str());
+    addDebugText(ss.str(), level);
     XFree(name);
 }
 
-void WindowManager::addDebugText(const std::string& text) {
+void WindowManager::addDebugText(const std::string& text, LogLevel level) {
+    if (level > currentLogLevel)
+        return;
+
     static string lastText;
     if (lastText == text) {
         debugStrings.front() += ".";

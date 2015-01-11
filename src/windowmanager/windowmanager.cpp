@@ -90,14 +90,10 @@ WmWindow* WindowManager::addWindow(Window window) {
 
     stringstream ss;
     ss << desktop.x << ":" << desktop.w << ":" << desktop.y << ":" << desktop.h;
-    addDebugText(ss.str());
+    addDebugText(ss.str(), LogLevel::Verbose);
 
     XWindowAttributes attributes;
     XGetWindowAttributes(display, w->frame, &attributes);
-
-    w->selectDefaultInput();
-    w->setDefaultEventMask();
-    w->show();
 
     if (!currentWindow)
         setCurrentWindow(w);
@@ -155,7 +151,7 @@ void WindowManager::setCurrentWindow(WmWindow* window) {
 
     stringstream ss;
     ss << "CURRENT WINDOW 0x" << hex << currentWindow;
-    addDebugText(ss.str());
+    addDebugText(ss.str(), LogLevel::Verbose);
 
     if (currentWindow) {
         currentWindow->setActive(true);
@@ -229,7 +225,7 @@ void WindowManager::selectNewCurrentWindow() {
 }
 
 void WindowManager::spawn(const std::string& cmd, char *const argv[]) {
-    addDebugText(cmd);
+    addDebugText(cmd, LogLevel::Info);
     pid_t pid = fork();
     if (pid == 0) {
         execv(cmd.c_str(), argv);

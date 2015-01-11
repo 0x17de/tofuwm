@@ -20,61 +20,61 @@ void WindowManager::loop() {
         XNextEvent(display, &event);
         switch (event.type) {
             case MapRequest:
-                addDebugText("EVENT MapRequest");
+                addDebugText("EVENT MapRequest", LogLevel::VeryVerbose);
                 onMapRequest(); break;
             case EnterNotify:
-                addDebugText("EVENT EnterNotify");
+                addDebugText("EVENT EnterNotify", LogLevel::VeryVerbose);
                 onEnterNotify(); break;
             case LeaveNotify:
-                addDebugText("EVENT LeaveNotify");
+                addDebugText("EVENT LeaveNotify", LogLevel::VeryVerbose);
                 onLeaveNotify(); break;
             case ConfigureRequest:
-                addDebugText("EVENT ConfigureRequest");
+                addDebugText("EVENT ConfigureRequest", LogLevel::VeryVerbose);
                 onConfigureRequest(); break;
             case ResizeRequest:
-                addDebugText("EVENT ResizeRequest");
+                addDebugText("EVENT ResizeRequest", LogLevel::VeryVerbose);
                 onResizeRequest(); break;
             case CirculateRequest:
-                addDebugText("EVENT CirculateRequest");
+                addDebugText("EVENT CirculateRequest", LogLevel::VeryVerbose);
                 onCirculateRequest(); break;
             case KeyPress:
-                addDebugText("EVENT KeyPress");
+                addDebugText("EVENT KeyPress", LogLevel::VeryVerbose);
                 onKeyPress(); break;
             case KeyRelease:
-                addDebugText("EVENT KeyRelease");
+                addDebugText("EVENT KeyRelease", LogLevel::VeryVerbose);
                 onKeyRelease(); break;
             case ButtonPress:
-                addDebugText("EVENT ButtonPress");
+                addDebugText("EVENT ButtonPress", LogLevel::VeryVerbose);
                 onButtonPress(); break;
             case ButtonRelease:
-                addDebugText("EVENT ButtonRelease");
+                addDebugText("EVENT ButtonRelease", LogLevel::VeryVerbose);
                 onButtonRelease(); break;
             case MotionNotify:
-                addDebugText("EVENT MotionNotify");
+                addDebugText("EVENT MotionNotify", LogLevel::VeryVerbose);
                 onMotion(); break;
             case CirculateNotify:
-                addDebugText("EVENT CirculateNotify");
+                addDebugText("EVENT CirculateNotify", LogLevel::VeryVerbose);
                 onCirculateNotify(); break;
             case ConfigureNotify:
-                addDebugText("EVENT ConfigureNotify");
+                addDebugText("EVENT ConfigureNotify", LogLevel::VeryVerbose);
                 onConfigureNotify(); break;
             case DestroyNotify:
-                addDebugText("EVENT DestroyNotify");
+                addDebugText("EVENT DestroyNotify", LogLevel::VeryVerbose);
                 onDestroyNotify(); break;
             case GravityNotify:
-                addDebugText("EVENT GravityNotify");
+                addDebugText("EVENT GravityNotify", LogLevel::VeryVerbose);
                 onGravityNotify(); break;
             case MapNotify:
-                addDebugText("EVENT MapNotify");
+                addDebugText("EVENT MapNotify", LogLevel::VeryVerbose);
                 onMapNotify(); break;
             case ReparentNotify:
-                addDebugText("EVENT ReparentNotify");
+                addDebugText("EVENT ReparentNotify", LogLevel::VeryVerbose);
                 onReparentNotify(); break;
             case UnmapNotify:
-                addDebugText("EVENT UnmapNotify");
+                addDebugText("EVENT UnmapNotify", LogLevel::VeryVerbose);
                 onUnmapNotify(); break;
             case ClientMessage:
-                addDebugText("EVENT ClientMessage");
+                addDebugText("EVENT ClientMessage", LogLevel::VeryVerbose);
                 onClientMessage(); break;
         }
         printDebugText();

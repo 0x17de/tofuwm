@@ -14,7 +14,6 @@ enum class WindowMode {
 class WindowManager;
 class Workspace;
 class WmWindow : public WmFrame, public std::enable_shared_from_this<WmWindow> {
-    bool staysFloating_ = false;
 public:
     WindowManager* wm;
     Window window;
@@ -33,12 +32,8 @@ public:
     void hide();
     int minWindowSize();
     void setActive(bool active);
-    bool staysFloating();
-    void toggleFloating();
     bool supportsProtocol(Atom protocol) throw ();
     void close();
-    void selectNoInput();
-    void selectDefaultInput();
     void setDefaultEventMask();
 
     void resize(int w, int h);

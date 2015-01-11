@@ -33,16 +33,16 @@ void WindowManager::onClientMessage() {
     static Atom A__NET_REQUEST_FRAME_EXTENTS = getAtom("_NET_REQUEST_FRAME_EXTENTS");
 
     if (A__NET_WM_STATE == event.xclient.message_type) {
-        addDebugText("onNetWmState");
+        addDebugText("onNetWmState", LogLevel::VeryVerbose);
         onNetWmState();
     } else if (A__NET_REQUEST_FRAME_EXTENTS == event.xclient.message_type) {
-        addDebugText("onNetRequestFrameExtents");
+        addDebugText("onNetRequestFrameExtents", LogLevel::VeryVerbose);
         onNetRequestFrameExtents();
     } else if (A__NET_ACTIVE_WINDOW == event.xclient.message_type) {
-        addDebugText("onNetRequestActiveWindow");
+        addDebugText("onNetRequestActiveWindow", LogLevel::VeryVerbose);
         onNetRequestActiveWindow();
     } else {
-        debugPrintUnknownAtom(event.xclient.message_type);
+        debugPrintUnknownAtom(event.xclient.message_type, LogLevel::Warning);
     }
 }
 

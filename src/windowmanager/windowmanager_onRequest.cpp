@@ -16,10 +16,10 @@ void WindowManager::onMapRequest() {
 }
 
 void WindowManager::onConfigureRequest() {
-    if (event.xconfigurerequest.window) {
+    if (event.xconfigurerequest.window && !moveWindow) {
         stringstream ss;
         ss << "CONFIG WND " << event.xconfigurerequest.window;
-        addDebugText(ss.str());
+        addDebugText(ss.str(), LogLevel::VeryVerbose);
 
         WmWindow* w = findWindow(event.xconfigurerequest.window);
         if (w == nullptr) {
@@ -48,7 +48,7 @@ void WindowManager::onResizeRequest() { // @TODO: fix resize request
     if (event.xresizerequest.window) {
         stringstream ss;
         ss << "RESIZE WND " << event.xresizerequest.window;
-        addDebugText(ss.str());
+        addDebugText(ss.str(), LogLevel::VeryVerbose);
 
         WmWindow* w = findWindow(event.xresizerequest.window);
         if (w && w->window == event.xresizerequest.window) {

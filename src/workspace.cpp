@@ -41,7 +41,7 @@ void Workspace::addWindow(WmWindow* w) {
     if (w->workspace)
         w->workspace->removeWindow(w);
     w->workspace = this;
-    if (workspaceMode_ == WorkspaceMode::Floating || w->staysFloating()) {
+    if (workspaceMode_ == WorkspaceMode::Floating) {
         w->windowMode = WindowMode::Floating;
         floatingWindows.push_back(w);
         wm->setCurrentWindow(w);
