@@ -23,11 +23,15 @@ void Workspace::workspaceMode(WorkspaceMode workspaceMode) {
 }
 
 void Workspace::hide() {
+    for(WmWindow* w : floatingWindows)
+        w->hide();
     for(WmWindow* w : windows)
         w->hide();
 }
 
 void Workspace::show() {
+    for(WmWindow* w : floatingWindows)
+        w->show();
     for(WmWindow* w : windows)
         w->show();
 }
@@ -42,7 +46,6 @@ void Workspace::addWindow(WmWindow* w) {
         windows.push_back(w);
         lastActiveTiledWindow = w;
     }
-    w->show();
 }
 
 std::shared_ptr<WmContainer> Workspace::createNewContainer() {
@@ -94,7 +97,6 @@ void Workspace::toggleWindowMode(WmWindow* w) {
         windows.remove(w);
         floatingWindows.push_back(w);
     }
-    w->show();
 }
 
 WmContainer* Workspace::checkCleanContainer(WmContainer *container) {
