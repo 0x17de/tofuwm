@@ -60,7 +60,7 @@ WmHotkey::~WmHotkey() {
     XUngrabKey(display, keyCode_, modifier_, window);
 }
 
-unsigned int WmHotkey::keyCode() {
+int WmHotkey::keyCode() {
     return keyCode_;
 }
 

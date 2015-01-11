@@ -121,7 +121,7 @@ public:
 
     void run();
 
-    friend KeyGrabber;
+    friend class KeyGrabber;
 };
 
 #endif // WINDOWMANAGER_H

@@ -35,7 +35,7 @@ public:
     WmHotkey(Display* display, Window window, int keyCode, unsigned int modifier, std::function<void()> onPress, std::function<void()> onRelease);
     ~WmHotkey();
 
-    unsigned int keyCode();
+    int keyCode();
     unsigned int modifier();
     void onPress();
     void onRelease();

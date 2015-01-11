@@ -51,7 +51,7 @@ void WindowManager::changeSplitterDirectionOfWindow(WmWindow *window) {
             return;
 
         switch (parent->containerType()) {
-            case WmFrameType::Splitter:
+            case WmFrameType::Splitter: {
                 WmSplitter *splitter = (WmSplitter *) parent;
 
                 WmSplitterType newType;
@@ -70,6 +70,11 @@ void WindowManager::changeSplitterDirectionOfWindow(WmWindow *window) {
                     newSplitter->splitRatio(window->splitRatio());
                     splitter->realign();
                 }
+                break;
+            }
+            // Not used - to suppress warnings
+            case WmFrameType::Frame:
+            case WmFrameType::Window:
                 break;
         }
     }
