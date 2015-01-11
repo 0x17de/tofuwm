@@ -37,6 +37,15 @@ size_t WmContainer::size() {
 void WmContainer::add(std::shared_ptr<WmFrame> frame, WmFrame* after) {
     frame->parent(this);
 
+    if (children_.size() > 0) {
+        // Calculate scale of new window
+        double sum = 0.0;
+        for (auto &child : children_) {
+            sum += child->splitRatio();
+        }
+        frame->splitRatio(sum / children_.size());
+    }
+
     if (after) {
         // Try to insert after specified element
         for (auto it = begin(children_); it != end(children_); ++it) {
