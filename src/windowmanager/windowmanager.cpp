@@ -81,6 +81,8 @@ void WindowManager::setCurrentWindow(WmWindow* window) {
         currentWindow->setActive(false);
 
     currentWindow = window;
+    if (currentWindow->windowMode == WindowMode::Tiled)
+        currentWorkspace->lastActiveTiledWindow = currentWindow;
 
     stringstream ss;
     ss << "CURRENT WINDOW 0x" << hex << currentWindow;

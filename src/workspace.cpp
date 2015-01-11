@@ -40,11 +40,12 @@ void Workspace::addWindow(WmWindow* w) {
     if (workspaceMode_ == WorkspaceMode::Floating || w->staysFloating()) {
         w->windowMode = WindowMode::Floating;
         floatingWindows.push_back(w);
+        wm->setCurrentWindow(w);
     } else {
         w->windowMode = WindowMode::Tiled;
         addWindowToTiling(w);
         windows.push_back(w);
-        lastActiveTiledWindow = w;
+        wm->setCurrentWindow(w);
     }
 }
 

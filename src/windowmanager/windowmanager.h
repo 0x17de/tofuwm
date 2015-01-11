@@ -66,12 +66,14 @@ private:
     void loop();
     void calculateDesktopSpace();
     void spawn(const std::string& cmd, char *const argv[]);
-    void setCurrentWindow(Window window);
-    void setCurrentWindow(WmWindow* window);
     WmWindow* addWindow(Window window);
     WmWindow* findWindow(Window window);
     void selectNewCurrentWindow();
     static inline constexpr int workspaceCount() { return 10; }
+public:
+    void setCurrentWindow(Window window);
+    void setCurrentWindow(WmWindow* window);
+private:
 
 public:
     Atom getAtom(const std::string& protocol);
