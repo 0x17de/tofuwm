@@ -7,11 +7,15 @@ using namespace std;
 
 
 int main() {
-    try {
-        WindowManager windowManager;
-        windowManager.run();
-    } catch(exception& e) {
-        cerr << "Aborted: " << e.what() << endl;
+    bool normalExit = false;
+    while (!normalExit) { // Recover from crashes
+        try {
+            WindowManager windowManager;
+            windowManager.run();
+            normalExit = true;
+        } catch (exception &e) {
+            cerr << "Aborted: " << e.what() << endl;
+        }
     }
     return 0;
 }

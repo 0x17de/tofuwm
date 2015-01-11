@@ -114,8 +114,7 @@ void WindowManager::removeDestroyedWindow(Window w) {
     if (!destroyedWindow)
         return;
 
-    destroyedWindow->window = 0;
-
+    destroyedWindow->isMapped = false;
     removeWindow(destroyedWindow);
 }
 
@@ -169,6 +168,7 @@ void WindowManager::changeWorkspace(int number) {
     currentWorkspace->hide();
     currentWorkspace = &workspaces[number];
     if (moveWindow) {
+        shared_ptr<WmWindow> w(moveWindow->shared());
         moveWindow->workspace->removeWindow(moveWindow);
         currentWorkspace->addWindow(moveWindow);
     }

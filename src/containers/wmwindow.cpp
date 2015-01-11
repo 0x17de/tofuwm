@@ -24,10 +24,10 @@ WmWindow::WmWindow(WindowManager* wm, Window window) :
 
 WmWindow::~WmWindow() {
     selectNoInput();
-    //XWindowAttributes wAttr;
-    //XGetWindowAttributes(wm->display, frame, &wAttr);
+    XWindowAttributes wAttr;
+    XGetWindowAttributes(wm->display, frame, &wAttr);
     if (window && isMapped)
-        XReparentWindow(wm->display, window, wm->root, 0, 0);
+        XReparentWindow(wm->display, window, wm->root, wAttr.x, wAttr.y);
     XDestroyWindow(wm->display, frame);
 }
 
