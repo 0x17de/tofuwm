@@ -11,6 +11,8 @@ void WindowManager::onEnterNotify() {
 
     setCurrentWindow(event.xcrossing.window);
     currentWindow->setActive(true);
+    if (currentWindow->windowMode == WindowMode::Tiled)
+        currentWorkspace->lastActiveTiledWindow = currentWindow;
 }
 
 void WindowManager::onLeaveNotify() {
@@ -29,6 +31,8 @@ void WindowManager::onConfigureNotify() {
 
 void WindowManager::onDestroyNotify() {
     bool newCurrentWindow = currentWindow && *currentWindow == event.xdestroywindow.window;
+    if (currentWindow == currentWorkspace->lastActiveTiledWindow)
+        currentWorkspace->lastActiveTiledWindow = 0; // @TODO: Select next best tiled window
 
     auto it = windows.find(event.xdestroywindow.window);
     it->second->window = 0; // as it is already destroyed

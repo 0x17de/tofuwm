@@ -7,16 +7,25 @@
 
 enum class WorkspaceMode {
     Floating,
-    Tiling
+    HorizontalTiling,
+    VerticalTiling
 };
 
 class Workspace {
     // New windows are created in this mode
     WorkspaceMode workspaceMode_ = WorkspaceMode::Floating;
-public:
-    std::list<WmWindow*> windows;
+    WindowManager* wm;
 
-    Workspace();
+    void addWindowToTiling(WmWindow* w);
+    std::shared_ptr<WmContainer> createNewContainer();
+public:
+
+    std::list<WmWindow*> floatingWindows;
+    std::list<WmWindow*> windows;
+    WmWindow* lastActiveTiledWindow = 0;
+    std::shared_ptr<WmContainer> rootContainer;
+
+    Workspace(WindowManager* wm);
     ~Workspace();
 
     WorkspaceMode workspaceMode();
@@ -26,6 +35,7 @@ public:
 
     void addWindow(WmWindow* w);
     void removeWindow(WmWindow* w);
+    void toggleWindowMode(WmWindow* w);
 };
 
 #endif // WORKSPACE_H

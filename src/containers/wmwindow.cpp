@@ -30,8 +30,12 @@ WmWindow::~WmWindow() {
     XDestroyWindow(wm->display, frame);
 }
 
-WmContainerType WmWindow::containerType() {
-    return WmContainerType::Window;
+std::shared_ptr<WmWindow> WmWindow::shared() {
+    return shared_from_this();
+}
+
+WmFrameType WmWindow::containerType() {
+    return WmFrameType::Window;
 }
 
 void WmWindow::hide() {

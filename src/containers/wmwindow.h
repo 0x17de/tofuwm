@@ -5,20 +5,29 @@
 #include <X11/Xlib.h>
 #include "wmcontainer.h"
 
+
+enum class WindowMode {
+    Floating,
+    Tiled
+};
+
 class WindowManager;
 class Workspace;
-class WmWindow : public WmContainer {
+class WmWindow : public WmFrame, public std::enable_shared_from_this<WmWindow> {
     bool staysFloating_ = false;
 public:
     WindowManager* wm;
     Window window;
     Window frame;
     Workspace* workspace = 0;
+    WindowMode windowMode = WindowMode::Floating;
+    WmContainer* container;
 
     WmWindow(WindowManager* wm, Window window);
     ~WmWindow();
+    std::shared_ptr<WmWindow> shared();
 
-    virtual WmContainerType containerType();
+    virtual WmFrameType containerType();
 
     void show();
     void hide();

@@ -12,8 +12,7 @@
 using namespace std;
 
 
-WindowManager::WindowManager() :
-workspaces(workspaceCount())
+WindowManager::WindowManager()
 {
     displayPtr = shared_ptr<Display>(XOpenDisplay(0), Free_XCloseDisplay());
     if (!displayPtr) throw runtime_error("Display is not open");
@@ -23,6 +22,8 @@ workspaces(workspaceCount())
     keyGrabber = make_shared<KeyGrabber>(this, workspaceCount());
     fontHelper = make_shared<FontHelper>(display);
 
+    for (int i = 0; i < workspaceCount(); ++i)
+        workspaces.emplace_back(this);
     currentWorkspace = &workspaces[0];
 }
 

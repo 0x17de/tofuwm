@@ -2,11 +2,31 @@
 #define WMSPLITTER_H
 
 
+#include <list>
+#include <memory>
 #include "wmcontainer.h"
 
 
+enum class WmSplitterType {
+    Horizontal,
+    Vertical
+};
+
 class WmSplitter : public WmContainer {
-    virtual WmContainerType containerType();
+    WmSplitterType splitterType_;
+public:
+    std::list<std::shared_ptr<WmFrame>> children;
+
+    WmSplitter(WmSplitterType splitterType);
+    ~WmSplitter();
+
+    WmSplitterType splitterType();
+
+    void add(std::shared_ptr<WmFrame> frame) override;
+    void remove(std::shared_ptr<WmFrame> frame) override;
+    void relocate(int x, int y, int width, int height) override;
+
+    virtual WmFrameType containerType();
 };
 
 

@@ -2,14 +2,22 @@
 #define WMCONTAINER_H
 
 
-enum class WmContainerType {
-    Window,
-    Frame,
-    Splitter
-};
+#include <memory>
+#include "wmframe.h"
 
-class WmContainer {
-    virtual WmContainerType containerType() = 0;
+
+class WmWindow;
+
+class WmContainer : public WmFrame {
+    WmContainer* parentContainer_ = 0;
+public:
+    WmContainer* parentContainer();
+    void parentContainer(WmContainer* parentContainer);
+
+    virtual void add(std::shared_ptr<WmFrame> frame) = 0;
+    virtual void remove(std::shared_ptr<WmFrame> frame) = 0;
+    virtual void relocate(int x, int y, int width, int height) = 0;
+    virtual WmFrameType containerType() = 0;
 };
 
 

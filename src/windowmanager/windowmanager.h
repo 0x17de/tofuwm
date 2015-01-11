@@ -11,10 +11,8 @@
 #include "containers/wmwindow.h"
 #include "containers/wmcontainer.h"
 #include "fonthelper.h"
+#include "geometry.h"
 
-struct Geometry {
-    int x, y, w, h;
-};
 
 class WindowManager {
 private:
@@ -22,7 +20,9 @@ private:
     std::list<std::string> debugStrings;
 
     // Viewport
+public:
     Geometry desktop; // For using docks, blocked areas
+private:
     std::list<std::shared_ptr<WmWindow>> dockedWindows;
 
     // Move window
@@ -49,9 +49,6 @@ private:
 
     WmWindow* currentWindow = 0;
     std::map<Window, std::shared_ptr<WmWindow>> windows;
-
-    // Tiling
-    std::shared_ptr<WmContainer> rootContainer;
 
     // Workspaces
     std::vector<Workspace> workspaces;

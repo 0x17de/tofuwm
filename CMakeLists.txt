@@ -20,6 +20,7 @@ set(SOURCE_FILES
     src/keygrabber.cpp src/keygrabber.h
     src/wmhotkey.cpp src/wmhotkey.h
     src/display.h
+    src/geometry.h
     src/workspace.cpp src/workspace.h
     src/fonthelper.cpp src/fonthelper.h
     src/containers/wmwindow.cpp src/containers/wmwindow.h
