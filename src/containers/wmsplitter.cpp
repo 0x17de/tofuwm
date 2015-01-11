@@ -17,13 +17,20 @@ WmSplitterType WmSplitter::splitterType() {
     return splitterType_;
 }
 
+size_t WmSplitter::size() {
+    return children.size();
+}
+
 void WmSplitter::add(std::shared_ptr<WmFrame> frame) {
     frame->parent(this);
     children.push_back(frame);
 }
 
-void WmSplitter::remove(std::shared_ptr<WmFrame> frame) {
-    children.remove(frame);
+void WmSplitter::remove(WmFrame* frame) {
+    for (auto it = begin(children); it != end(children); ++it) {
+        if ((*it).get() == frame)
+            children.erase(it);
+    }
     frame->parent(0);
 }
 

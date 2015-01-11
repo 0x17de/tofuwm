@@ -62,8 +62,8 @@ WmWindow* WindowManager::addWindow(Window window) {
     w->setDefaultEventMask();
     w->show();
 
-    if (currentWindow == 0)
-        currentWindow = w;
+    if (!currentWindow)
+        setCurrentWindow(w);
 
     w->relocate(desktop.x + (desktop.w - attributes.width) / 2,
             desktop.y + (desktop.h - attributes.height) / 2,
@@ -77,25 +77,31 @@ void WindowManager::setCurrentWindow(Window window) {
 }
 
 void WindowManager::setCurrentWindow(WmWindow* window) {
+    if (currentWindow)
+        currentWindow->setActive(false);
+
     currentWindow = window;
 
     stringstream ss;
     ss << "CURRENT WINDOW 0x" << hex << currentWindow;
     addDebugText(ss.str());
 
+    if (currentWindow)
+        currentWindow->setActive(true);
     // @TODO: Set _NET_ACTIVE_WINDOW
 }
 
 void WindowManager::changeWorkspace(int number) {
-    currentWindow = 0;
     if (currentWorkspace == &workspaces[number])
         return; // same workspace
+    setCurrentWindow(nullptr);
 
     currentWorkspace->hide();
     currentWorkspace = &workspaces[number];
     if (moveWindow)
         moveWindow->setWorkspace(currentWorkspace);
     currentWorkspace->show();
+
     selectNewCurrentWindow();
     // @TODO: update _NET_CURRENT_DESKTOP, _NET_NUMBER_OF_DESKTOPS
 }
@@ -109,7 +115,6 @@ void WindowManager::calculateDesktopSpace() {
     d.y = rAttr.y;
     d.w = rAttr.width;
     d.h = rAttr.height;
-
 
     // @TODO: docked, when: _NET_WM_WINDOW_TYPE => _NET_WM_WINDOW_TYPE_DOCK
     for (shared_ptr<WmWindow>& w : dockedWindows) {

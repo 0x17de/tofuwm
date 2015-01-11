@@ -40,6 +40,7 @@ public:
 
     void addWindow(WmWindow* w);
     void removeWindow(WmWindow* w);
+    WmContainer* checkCleanContainer(WmContainer* container);
     void toggleWindowMode(WmWindow* w);
 };
 

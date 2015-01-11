@@ -19,7 +19,6 @@ void WindowManager::onLeaveNotify() {
     if (!currentWindow || moveWindow)
         return;
 
-    currentWindow->setActive(false);
     setCurrentWindow(nullptr);
 }
 

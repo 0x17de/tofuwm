@@ -97,15 +97,32 @@ void Workspace::toggleWindowMode(WmWindow* w) {
     w->show();
 }
 
+WmContainer* Workspace::checkCleanContainer(WmContainer *container) {
+    if (container->size() > 0)
+        return container;
+
+    WmContainer* parent = container->parent();
+    if (parent != 0)
+        return checkCleanContainer(parent);
+
+    // no parent -> we are root container
+    rootContainer.reset();
+    return 0; // no parent container
+}
+
 void Workspace::removeWindow(WmWindow* w) {
     switch (w->windowMode) {
         case WindowMode::Floating:
-            floatingWindows.remove(w); break;
+            floatingWindows.remove(w);
+            break;
         case WindowMode::Tiled:
             windows.remove(w);
             WmContainer* container = w->parent();
             if (container)
-                container->remove(w->shared());
+                container->remove(w);
+            WmContainer* toAlign = checkCleanContainer(container);
+            if (toAlign)
+                toAlign->realign();
             break;
     }
     if (w == lastActiveTiledWindow)

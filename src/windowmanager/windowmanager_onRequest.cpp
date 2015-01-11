@@ -8,13 +8,11 @@ using namespace std;
 
 
 void WindowManager::onMapRequest() {
-    selectNoInput();
     if (event.xmaprequest.parent == root) {
         addWindow(event.xmaprequest.window);
     } else {
         XMapWindow(display, event.xmaprequest.window);
     }
-    selectDefaultInput();
 }
 
 void WindowManager::onConfigureRequest() {

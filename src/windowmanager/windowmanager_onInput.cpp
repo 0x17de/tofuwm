@@ -7,6 +7,14 @@
 using namespace std;
 
 
+static unsigned int motionMasks =
+        Button1MotionMask
+        |Button2MotionMask
+        |Button3MotionMask
+        |Button4MotionMask
+        |Button5MotionMask;
+
+
 void WindowManager::onKeyPress() {
     for (WmHotkey& hotkey : keyGrabber->hotkeys) {
         if (event.xkey.state == hotkey.modifier()
@@ -28,8 +36,10 @@ void WindowManager::onKeyRelease() {
 }
 
 void WindowManager::onButtonPress() {
+    unsigned int state = event.xbutton.state &~ motionMasks;
+
     for (WmHotbutton& hotbutton : keyGrabber->hotbuttons) {
-        if (event.xbutton.state == hotbutton.modifier()
+        if (state == hotbutton.modifier()
          && event.xbutton.button == hotbutton.buttonCode()) {
             hotbutton.onPress();
             break;
@@ -38,8 +48,10 @@ void WindowManager::onButtonPress() {
 }
 
 void WindowManager::onButtonRelease() {
+    unsigned int state = event.xbutton.state &~ motionMasks;
+
     for (WmHotbutton& hotbutton : keyGrabber->hotbuttons) {
-        if (event.xbutton.state == hotbutton.modifier()
+        if (state == hotbutton.modifier()
          && event.xbutton.button == hotbutton.buttonCode()) {
             hotbutton.onRelease();
             break;
@@ -47,17 +59,7 @@ void WindowManager::onButtonRelease() {
     }
 }
 
-static unsigned int motionMasks =
-                Button1MotionMask
-                |Button2MotionMask
-                |Button3MotionMask
-                |Button4MotionMask
-                |Button5MotionMask;
 void WindowManager::onMotion() {
-    stringstream ss;
-    ss << event.xmotion.state;
-    addDebugText(ss.str());
-
     unsigned int state = event.xmotion.state &~ motionMasks;
 
     for (WmHotbutton& hotbutton : keyGrabber->hotbuttons) {
@@ -73,9 +75,9 @@ void WindowManager::onMousePress() {
         moveWindow = findWindow(event.xbutton.subwindow);
         if (!moveWindow)
             return;
+
         moveWindow->selectNoInput();
-        currentWindow = moveWindow;
-        currentWindow->setActive(true);
+        setCurrentWindow(moveWindow);
         XGetWindowAttributes(display, moveWindow->frame, &moveWindowAttributes);
         moveWindowStart = event.xbutton;
         XRaiseWindow(display, moveWindow->frame);
@@ -90,7 +92,7 @@ void WindowManager::onMouseRelease() {
     if (moveWindow) {
         moveWindow->selectDefaultInput();
         moveWindowStart.subwindow = None;
-        moveWindow = 0;
+        moveWindow = nullptr;
     }
 }
 

@@ -22,8 +22,9 @@ public:
 
     WmSplitterType splitterType();
 
+    virtual size_t size();
     void add(std::shared_ptr<WmFrame> frame) override;
-    void remove(std::shared_ptr<WmFrame> frame) override;
+    void remove(WmFrame* frame) override;
     void relocate(int x, int y, int width, int height) override;
 
     virtual WmFrameType containerType();
