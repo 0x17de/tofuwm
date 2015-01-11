@@ -21,7 +21,6 @@ public:
     Window frame;
     Workspace* workspace = 0;
     WindowMode windowMode = WindowMode::Floating;
-    WmContainer* container;
 
     WmWindow(WindowManager* wm, Window window);
     ~WmWindow();

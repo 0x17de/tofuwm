@@ -7,13 +7,18 @@
 
 enum class WorkspaceMode {
     Floating,
-    HorizontalTiling,
-    VerticalTiling
+    Tiling
+};
+
+enum class WorkspaceTilingMode {
+    Horizontal,
+    Vertical
 };
 
 class Workspace {
     // New windows are created in this mode
     WorkspaceMode workspaceMode_ = WorkspaceMode::Floating;
+    WorkspaceTilingMode workspaceTilingMode_ = WorkspaceTilingMode::Horizontal;
     WindowManager* wm;
 
     void addWindowToTiling(WmWindow* w);

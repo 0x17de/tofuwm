@@ -21,8 +21,12 @@ void WindowManager::addDebugText(const std::string& text) {
     static string lastText;
     if (lastText == text) {
         debugStrings.front() += ".";
+        cout << ".";
+        cout.flush();
     } else {
         debugStrings.push_front(text);
+        cout << endl << text;
+        cout.flush();
         if (debugStrings.size() > 30)
             debugStrings.pop_back();
         lastText = text;

@@ -25,6 +25,13 @@ workspaceCount(workspaceCount)
             [=] { wm->onMouseRelease(); },
             [=] { wm->onMouseMotion(); });
 
+    // Toggle window mode (tiling/floating)
+    hotkeys.emplace_back(wm->display, wm->root,
+            key("e"), defaultModifier,
+            [=] {
+                if (wm->currentWindow)
+                    wm->currentWorkspace->toggleWindowMode(wm->currentWindow);
+            }, nullptr);
     // Spawn dmenu
     hotkeys.emplace_back(wm->display, wm->root,
             key("d"), defaultModifier,

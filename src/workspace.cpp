@@ -47,11 +47,11 @@ void Workspace::addWindow(WmWindow* w) {
 
 std::shared_ptr<WmContainer> Workspace::createNewContainer() {
     std::shared_ptr<WmContainer> container;
-    switch (workspaceMode_) {
-        case WorkspaceMode::HorizontalTiling:
+    switch (workspaceTilingMode_) {
+        case WorkspaceTilingMode::Horizontal:
             container = make_shared<WmSplitter>(WmSplitterType::Horizontal);
             break;
-        case WorkspaceMode::VerticalTiling:
+        case WorkspaceTilingMode::Vertical:
             container = make_shared<WmSplitter>(WmSplitterType::Vertical);
             break;
     }
@@ -64,18 +64,22 @@ std::shared_ptr<WmContainer> Workspace::createNewContainer() {
 }
 
 void Workspace::addWindowToTiling(WmWindow* w) {
-    WmContainer* container = 0;
-    if (!lastActiveTiledWindow && windows.size() > 0)
-        lastActiveTiledWindow = windows.back();
+    WmContainer *container = 0;
+
     if (lastActiveTiledWindow) {
-        container = lastActiveTiledWindow->container;
-    } else {
-        rootContainer = createNewContainer();
+        container = lastActiveTiledWindow->parent();
+    } else if (windows.size() > 0) {
+        container = windows.back()->parent();
+    }
+
+    if (!container) {
+        if (!rootContainer)
+            rootContainer = createNewContainer();
         container = rootContainer.get();
     }
+
     container->add(w->shared());
     container->realign();
-    // @TODO: recalculate tiles and reposition windows
 }
 
 void Workspace::toggleWindowMode(WmWindow* w) {

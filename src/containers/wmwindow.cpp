@@ -1,3 +1,4 @@
+#include <sstream>
 #include <cmath>
 #include <X11/Xlib.h>
 #include "windowmanager/windowmanager.h"
@@ -103,6 +104,10 @@ void WmWindow::resize(int w, int h) {
 }
 
 void WmWindow::relocate(int x, int y, int w, int h) {
+    stringstream ss;
+    ss << "RELOC " << window << ": " << x << ":" << y << ":" << w << ":" << h;
+    wm->addDebugText(ss.str());
+
     XWindowChanges xchanges;
     xchanges.width = max(minWindowSize(), w);
     xchanges.height = max(minWindowSize(), h);

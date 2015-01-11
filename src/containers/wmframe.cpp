@@ -9,6 +9,14 @@ void WmFrame::splitRatio(double newRatio) {
     splitRatio_ = newRatio;
 }
 
+WmContainer* WmFrame::parent() {
+    return parent_;
+}
+
+void WmFrame::parent(WmContainer* parent) {
+    parent_ = parent;
+}
+
 Geometry& WmFrame::geometry() {
     return geometry_;
 }

@@ -78,10 +78,11 @@ public:
 
 private:
     // === Debug
+public:
     void printDebugText();
     void addDebugText(const std::string& text);
     void debugPrintUnknownAtom(Atom atom) throw();
-
+private:
     // === Events & Notifications
     void onMotion();
     void onEnterNotify();

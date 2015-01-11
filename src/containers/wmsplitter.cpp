@@ -18,14 +18,19 @@ WmSplitterType WmSplitter::splitterType() {
 }
 
 void WmSplitter::add(std::shared_ptr<WmFrame> frame) {
+    frame->parent(this);
     children.push_back(frame);
 }
 
 void WmSplitter::remove(std::shared_ptr<WmFrame> frame) {
     children.remove(frame);
+    frame->parent(0);
 }
 
 void WmSplitter::relocate(int x, int y, int width, int height) {
+    if (children.size() == 0)
+        return;
+
     // normalize values
     std::list<double> scale;
     double sum = 0.0;
@@ -34,7 +39,8 @@ void WmSplitter::relocate(int x, int y, int width, int height) {
         scale.push_back(splitRatio);
         sum += splitRatio;
     }
-    if (sum == 0)
+
+    if (sum == 0.0)
         return;
 
     for (std::shared_ptr<WmFrame>& child : children) {
@@ -57,13 +63,13 @@ void WmSplitter::relocate(int x, int y, int width, int height) {
         g.h = subHeight;
         g.w = subWidth;
 
-        switch (child->containerType()) {
-            case WmFrameType::Splitter:
-                ((WmContainer*)child.get())->relocate(x, y, subWidth, subHeight);
-                break;
-        }
+        child->realign();
 
-        x += subWidth;
-        y += subHeight;
+
+        if (splitterType_ == WmSplitterType::Horizontal) {
+            y += subHeight;
+        } else {
+            x += subWidth;
+        }
     }
 }
