@@ -95,8 +95,8 @@ int WmWindow::minWindowSize() {
 
 void WmWindow::resize(int w, int h) {
     XWindowChanges xchanges;
-    xchanges.width = max(minWindowSize(), w);
-    xchanges.height = max(minWindowSize(), h);
+    xchanges.width = max(minWindowSize(), w - 4);
+    xchanges.height = max(minWindowSize(), h - 4);
     XConfigureWindow(wm->display, window, CWWidth|CWHeight, &xchanges);
     xchanges.width += 4;
     xchanges.height += 4;
@@ -116,8 +116,8 @@ void WmWindow::relocate(int x, int y, int w, int h) {
     wm->addDebugText(ss.str());
 
     XWindowChanges xchanges;
-    xchanges.width = max(minWindowSize(), w);
-    xchanges.height = max(minWindowSize(), h);
+    xchanges.width = max(minWindowSize(), w - 4);
+    xchanges.height = max(minWindowSize(), h - 4);
     XConfigureWindow(wm->display, window, CWWidth|CWHeight, &xchanges);
     xchanges.x = x;
     xchanges.y = y;

@@ -37,6 +37,9 @@ void WindowManager::onDestroyNotify() {
         destroyedWindow = findWindow(event.xdestroywindow.window);
 
     bool needNewCurrentWindow = currentWindow == destroyedWindow;
+    if (needNewCurrentWindow)
+        currentWindow = 0;
+
     if (destroyedWindow == currentWorkspace->lastActiveTiledWindow)
         currentWorkspace->lastActiveTiledWindow = 0; // @TODO: Select next best tiled window
 

@@ -47,6 +47,14 @@ workspaceCount(workspaceCount)
                 char *const parmList[] = {(char *) "dmenu_run", 0};
                 wm->spawn("/usr/bin/dmenu_run", parmList);
             }, nullptr);
+    // Spawn gedit for debugging wm
+    hotkeys.emplace_back(wm->display, wm->root,
+            key("t"), defaultModifier,
+            [=] {
+                wm->addDebugText("DMENU SPAWN");
+                char *const parmList[] = {(char *) "gedit", (char*) "--new-window", 0};
+                wm->spawn("/usr/bin/gedit", parmList);
+            }, nullptr);
     // Close active window
     hotkeys.emplace_back(wm->display, wm->root,
             key("q"), defaultModifier | ShiftMask,
