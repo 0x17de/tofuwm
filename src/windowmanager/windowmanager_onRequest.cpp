@@ -22,9 +22,24 @@ void WindowManager::onConfigureRequest() {
         addDebugText(ss.str());
 
         WmWindow* w = findWindow(event.xconfigurerequest.window);
-        if (w && w->window == event.xconfigurerequest.window) {
-            if (w->windowMode == WindowMode::Floating)
-                w->relocate(event.xconfigurerequest.x, event.xconfigurerequest.y, event.xconfigurerequest.width, event.xconfigurerequest.height);
+        if (w == nullptr) {
+            // Not known to the window manager
+            XWindowChanges xchanges;
+            xchanges.x = event.xconfigurerequest.x;
+            xchanges.y = event.xconfigurerequest.y;
+            xchanges.width = event.xconfigurerequest.width;
+            xchanges.height = event.xconfigurerequest.height;
+            xchanges.border_width = event.xconfigurerequest.border_width;
+            xchanges.sibling = event.xconfigurerequest.above;
+            xchanges.stack_mode = event.xconfigurerequest.detail;
+            XConfigureWindow(display, root,
+                    event.xconfigurerequest.value_mask, &xchanges);
+        } else if (w->window == event.xconfigurerequest.window) {
+            if (w->windowMode == WindowMode::Floating) {
+                w->relocate(event.xconfigurerequest.x, event.xconfigurerequest.y,
+                        event.xconfigurerequest.width, event.xconfigurerequest.height,
+                        event.xconfigurerequest.value_mask);
+            }
         }
     }
 }

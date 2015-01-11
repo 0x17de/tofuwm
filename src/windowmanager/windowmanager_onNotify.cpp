@@ -6,7 +6,7 @@ using namespace std;
 
 
 void WindowManager::onEnterNotify() {
-    if (moveWindow)
+    if (event.xcrossing.mode != NotifyNormal)
         return;
 
     setCurrentWindow(event.xcrossing.window);
@@ -19,9 +19,8 @@ void WindowManager::onEnterNotify() {
 }
 
 void WindowManager::onLeaveNotify() {
-    if (!currentWindow || moveWindow)
+    if (event.xcrossing.mode != NotifyNormal)
         return;
-
     setCurrentWindow(nullptr);
 }
 

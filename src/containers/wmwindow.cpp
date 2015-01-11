@@ -110,6 +110,22 @@ void WmWindow::realign() {
     selectDefaultInput();
 }
 
+void WmWindow::relocate(int x, int y, int w, int h, unsigned int event_mask) {
+    stringstream ss;
+    ss << "RELOC " << window << ": " << x << ":" << y << ":" << w << ":" << h;
+    wm->addDebugText(ss.str());
+
+    XWindowChanges xchanges;
+    xchanges.width = max(minWindowSize(), w - 4);
+    xchanges.height = max(minWindowSize(), h - 4);
+    XConfigureWindow(wm->display, window, event_mask &~ (CWX | CWY), &xchanges);
+    xchanges.x = x;
+    xchanges.y = y;
+    xchanges.width += 4;
+    xchanges.height += 4;
+    XConfigureWindow(wm->display, frame, event_mask, &xchanges);
+}
+
 void WmWindow::relocate(int x, int y, int w, int h) {
     stringstream ss;
     ss << "RELOC " << window << ": " << x << ":" << y << ":" << w << ":" << h;
