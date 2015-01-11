@@ -103,7 +103,9 @@ void Workspace::removeWindow(WmWindow* w) {
             floatingWindows.remove(w); break;
         case WindowMode::Tiled:
             windows.remove(w);
-            // @TODO: remove from container // w->container->remove();
+            WmContainer* container = w->parent();
+            if (container)
+                container->remove(w->shared());
             break;
     }
     if (w == lastActiveTiledWindow)
