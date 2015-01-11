@@ -10,22 +10,32 @@ KeyGrabber::KeyGrabber(WindowManager* wm, int workspaceCount) :
 wm(wm),
 workspaceCount(workspaceCount)
 {
-    hotbuttons.emplace_back(wm->display, wm->root,
-            1, defaultModifier(), ButtonPressMask | ButtonReleaseMask | PointerMotionMask,
-            nullptr, nullptr);
-    hotbuttons.emplace_back(wm->display, wm->root,
-            3, defaultModifier(), ButtonPressMask | ButtonReleaseMask | PointerMotionMask,
-            nullptr, nullptr);
+    const unsigned int defaultModifier = Mod4Mask;
 
+    // Move active window
+    hotbuttons.emplace_back(wm->display, wm->root,
+            1, defaultModifier, ButtonPressMask | ButtonReleaseMask | PointerMotionMask,
+            [=] { wm->onMousePress(); },
+            [=] { wm->onMouseRelease(); },
+            [=] { wm->onMouseMotion(); });
+    // Resize active window
+    hotbuttons.emplace_back(wm->display, wm->root,
+            3, defaultModifier, ButtonPressMask | ButtonReleaseMask | PointerMotionMask,
+            [=] { wm->onMousePress(); },
+            [=] { wm->onMouseRelease(); },
+            [=] { wm->onMouseMotion(); });
+
+    // Spawn dmenu
     hotkeys.emplace_back(wm->display, wm->root,
-            keyDMenu(), defaultModifier(),
+            key("d"), defaultModifier,
             [=] {
                 wm->addDebugText("DMENU SPAWN");
                 char *const parmList[] = {(char *) "dmenu_run", 0};
                 wm->spawn("/usr/bin/dmenu_run", parmList);
             }, nullptr);
+    // Close active window
     hotkeys.emplace_back(wm->display, wm->root,
-            keyClose(), defaultModifier() | ShiftMask,
+            key("q"), defaultModifier | ShiftMask,
             [=] {
                 wm->addDebugText("WINDOW CLOSE");
                 if (wm->currentWindow)
@@ -33,9 +43,10 @@ workspaceCount(workspaceCount)
                 wm->selectNewCurrentWindow();
             }, nullptr);
 
+    const char* const workspaceKeys[] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"};
     for (int i = 0; i < workspaceCount; ++i) {
         hotkeys.emplace_back(wm->display, wm->root,
-                keyWorkspace(i), defaultModifier(),
+                key(workspaceKeys[i]), defaultModifier,
                 [=] {
                     stringstream ss;
                     ss << "WORKSPACE " << (i+1);
@@ -48,19 +59,6 @@ workspaceCount(workspaceCount)
 KeyGrabber::~KeyGrabber() {
 }
 
-int KeyGrabber::defaultModifier() {
-    return Mod4Mask;
-}
-
-int KeyGrabber::keyWorkspace(int number) {
-    const char* const workspaceKeys[] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"};
-    return XKeysymToKeycode(wm->display, XStringToKeysym(workspaceKeys[number]));
-}
-
-int KeyGrabber::keyClose() {
-    return XKeysymToKeycode(wm->display, XStringToKeysym("q"));
-}
-
-int KeyGrabber::keyDMenu() {
-    return XKeysymToKeycode(wm->display, XStringToKeysym("d"));
+unsigned int KeyGrabber::key(const std::string& character) {
+    return XKeysymToKeycode(wm->display, XStringToKeysym(character.c_str()));
 }

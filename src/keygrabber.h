@@ -1,6 +1,7 @@
 #ifndef KEYGRABBER_H
 #define KEYGRABBER_H
 
+#include <string>
 #include <list>
 #include <X11/Xlib.h>
 #include "wmhotkey.h"
@@ -17,10 +18,7 @@ public:
     KeyGrabber(WindowManager* wm, int workspaceCount);
     ~KeyGrabber();
 
-    int defaultModifier();
-    int keyWorkspace(int number);
-    int keyClose();
-    int keyDMenu();
+    unsigned int key(const std::string &character);
 };
 
 #endif // KEYGRABBER_H

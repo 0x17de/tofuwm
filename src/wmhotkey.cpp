@@ -1,14 +1,15 @@
 #include "wmhotkey.h"
 
 
-WmHotbutton::WmHotbutton(Display *display, Window window, unsigned int buttonCode, unsigned int modifier, unsigned int mask, std::function<void()> onPress, std::function<void()> onRelease) :
-display(display),
-window(window),
-buttonCode_(buttonCode),
-modifier_(modifier),
-mask_(mask),
-onPress_(onPress),
-onRelease_(onRelease)
+WmHotbutton::WmHotbutton(Display *display, Window window, unsigned int buttonCode, unsigned int modifier, unsigned int mask, std::function<void()> onPress, std::function<void()> onRelease, std::function<void()> onMotion) :
+        display(display),
+        window(window),
+        buttonCode_(buttonCode),
+        modifier_(modifier),
+        mask_(mask),
+        onPress_(onPress),
+        onRelease_(onRelease),
+        onMotion_(onMotion)
 {
     XGrabButton(display, buttonCode, modifier, window, true, mask, GrabModeAsync, GrabModeAsync, None, None);
 }
@@ -37,6 +38,11 @@ void WmHotbutton::onPress() {
 void WmHotbutton::onRelease() {
     if (onRelease_)
         onRelease_();
+}
+
+void WmHotbutton::onMotion() {
+    if (onMotion_)
+        onMotion_();
 }
 
 WmHotkey::WmHotkey(Display *display, Window window, int keyCode, unsigned int modifier, std::function<void()> onPress, std::function<void()> onRelease) :

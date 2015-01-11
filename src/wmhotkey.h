@@ -12,9 +12,9 @@ class WmHotbutton {
     unsigned int buttonCode_;
     unsigned int modifier_;
     unsigned int mask_;
-    std::function<void()> onPress_, onRelease_;
+    std::function<void()> onPress_, onRelease_, onMotion_;
 public:
-    WmHotbutton(Display* display, Window window, unsigned int buttonCode, unsigned int modifier, unsigned int mask, std::function<void()> onPress, std::function<void()> onRelease);
+    WmHotbutton(Display* display, Window window, unsigned int buttonCode, unsigned int modifier, unsigned int mask, std::function<void()> onPress, std::function<void()> onRelease, std::function<void()> onMotion);
     ~WmHotbutton();
 
     unsigned int buttonCode();
@@ -22,6 +22,7 @@ public:
     unsigned int mask();
     void onPress();
     void onRelease();
+    void onMotion();
 };
 
 class WmHotkey {

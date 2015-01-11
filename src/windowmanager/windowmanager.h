@@ -93,6 +93,9 @@ private:
     void onKeyRelease();
     void onButtonPress();
     void onButtonRelease();
+    void onMousePress();
+    void onMouseRelease();
+    void onMouseMotion();
     void onConfigureRequest();
     void onResizeRequest();
     void onCirculateRequest();
