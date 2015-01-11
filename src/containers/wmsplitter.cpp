@@ -29,7 +29,7 @@ void WmSplitter::add(std::shared_ptr<WmFrame> frame) {
 void WmSplitter::remove(WmFrame* frame) {
     for (auto it = begin(children); it != end(children); ++it) {
         if ((*it).get() == frame)
-            children.erase(it);
+            it = children.erase(it);
     }
     frame->parent(0);
 }

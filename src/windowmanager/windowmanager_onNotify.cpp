@@ -29,17 +29,26 @@ void WindowManager::onConfigureNotify() {
 }
 
 void WindowManager::onDestroyNotify() {
-    bool newCurrentWindow = currentWindow && *currentWindow == event.xdestroywindow.window;
-    if (currentWindow == currentWorkspace->lastActiveTiledWindow)
+    WmWindow* destroyedWindow = currentWindow;
+    if (!destroyedWindow)
+        destroyedWindow = findWindow(event.xdestroywindow.window);
+
+    bool needNewCurrentWindow = currentWindow == destroyedWindow;
+    if (destroyedWindow == currentWorkspace->lastActiveTiledWindow)
         currentWorkspace->lastActiveTiledWindow = 0; // @TODO: Select next best tiled window
 
-    auto it = windows.find(event.xdestroywindow.window);
-    it->second->window = 0; // as it is already destroyed
-    auto it2 = windows.find(it->second->frame);
-    windows.erase(it);
-    windows.erase(it2);
+    destroyedWindow->setWorkspace(0); // remove from tiling
+    destroyedWindow->window = 0; // as the window is already destroyed
 
-    if (newCurrentWindow)
+    // Cleanup struct
+    auto it = windows.find(event.xdestroywindow.window);
+    if (it != windows.end())
+        windows.erase(event.xdestroywindow.window);
+    auto it2 = windows.find(destroyedWindow->frame);
+    if (it2 != windows.end())
+        windows.erase(it2);
+
+    if (needNewCurrentWindow)
         selectNewCurrentWindow();
 }
 

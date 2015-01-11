@@ -19,7 +19,7 @@ private:
     WmContainer* parent_ = 0;
 public:
     virtual WmFrameType containerType() = 0;
-    void realign();
+    virtual void realign();
     virtual void relocate(int x, int y, int width, int height) = 0;
 
     WmContainer* parent();

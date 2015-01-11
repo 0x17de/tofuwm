@@ -103,6 +103,13 @@ void WmWindow::resize(int w, int h) {
     XConfigureWindow(wm->display, frame, CWWidth|CWHeight, &xchanges);
 }
 
+void WmWindow::realign() {
+    selectNoInput();
+    Geometry& g = geometry();
+    relocate(g.x, g.y, g.w, g.h);
+    selectDefaultInput();
+}
+
 void WmWindow::relocate(int x, int y, int w, int h) {
     stringstream ss;
     ss << "RELOC " << window << ": " << x << ":" << y << ":" << w << ":" << h;

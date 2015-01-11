@@ -42,6 +42,7 @@ public:
     void setDefaultEventMask();
 
     void resize(int w, int h);
+    virtual void realign();
     void relocate(int x, int y, int w, int h);
 
     bool operator==(const Window& window);
