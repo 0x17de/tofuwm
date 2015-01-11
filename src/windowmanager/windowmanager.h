@@ -69,6 +69,7 @@ private:
     WmWindow* addWindow(Window window);
     WmWindow* findWindow(Window window);
     void selectNewCurrentWindow();
+    void changeSplitterDirectionOfWindow(WmWindow* window);
     static inline constexpr int workspaceCount() { return 10; }
 public:
     void setCurrentWindow(Window window);
@@ -108,6 +109,7 @@ private:
     void onMapNotify();
     void onReparentNotify();
     void onUnmapNotify();
+    void onPropertyNotify();
 
     void onClientMessage();
     void onNetWmState();

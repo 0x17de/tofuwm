@@ -4,6 +4,7 @@
 #include <X11/cursorfont.h>
 #include <unistd.h>
 #include <sstream>
+#include <containers/wmsplitter.h>
 
 #include "windowmanager.h"
 #include "display.h"
@@ -40,7 +41,37 @@ void WindowManager::selectNoInput() {
 }
 
 void WindowManager::selectDefaultInput() {
-    selectInput(ResizeRedirectMask | SubstructureRedirectMask);
+    selectInput(ResizeRedirectMask | SubstructureRedirectMask | PropertyNotify);
+}
+
+void WindowManager::changeSplitterDirectionOfWindow(WmWindow *window) {
+    if (currentWindow && currentWindow->windowMode == WindowMode::Tiled) {
+        WmContainer *parent = currentWindow->parent();
+        if (!parent)
+            return;
+
+        switch (parent->containerType()) {
+            case WmFrameType::Splitter:
+                WmSplitter *splitter = (WmSplitter *) parent;
+
+                WmSplitterType newType;
+                if (splitter->splitterType() == WmSplitterType::Horizontal)
+                    newType = WmSplitterType::Vertical;
+                else
+                    newType = WmSplitterType::Horizontal;
+
+                if (splitter->size() == 1)
+                    splitter->splitterType(newType);
+                else {
+                    shared_ptr<WmSplitter> newSplitter(make_shared<WmSplitter>(newType));
+                    splitter->add(newSplitter, window);
+                    splitter->remove(window);
+                    newSplitter->add(window->shared());
+                    splitter->realign();
+                }
+                break;
+        }
+    }
 }
 
 WmWindow* WindowManager::addWindow(Window window) {
@@ -81,15 +112,16 @@ void WindowManager::setCurrentWindow(WmWindow* window) {
         currentWindow->setActive(false);
 
     currentWindow = window;
-    if (currentWindow->windowMode == WindowMode::Tiled)
-        currentWorkspace->lastActiveTiledWindow = currentWindow;
 
     stringstream ss;
     ss << "CURRENT WINDOW 0x" << hex << currentWindow;
     addDebugText(ss.str());
 
-    if (currentWindow)
+    if (currentWindow) {
         currentWindow->setActive(true);
+        if (currentWindow->windowMode == WindowMode::Tiled)
+            currentWorkspace->lastActiveTiledWindow = currentWindow;
+    }
     // @TODO: Set _NET_ACTIVE_WINDOW
 }
 

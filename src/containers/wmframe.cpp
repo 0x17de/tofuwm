@@ -1,6 +1,12 @@
 #include "wmframe.h"
 
 
+WmFrame::WmFrame() {
+}
+
+WmFrame::~WmFrame() {
+}
+
 double WmFrame::splitRatio() {
     return splitRatio_;
 }

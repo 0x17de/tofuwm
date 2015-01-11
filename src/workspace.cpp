@@ -82,7 +82,7 @@ void Workspace::addWindowToTiling(WmWindow* w) {
         container = rootContainer.get();
     }
 
-    container->add(w->shared());
+    container->add(w->shared(), lastActiveTiledWindow);
     container->realign();
 }
 

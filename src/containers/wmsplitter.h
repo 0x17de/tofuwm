@@ -15,16 +15,12 @@ enum class WmSplitterType {
 class WmSplitter : public WmContainer {
     WmSplitterType splitterType_;
 public:
-    std::list<std::shared_ptr<WmFrame>> children;
-
     WmSplitter(WmSplitterType splitterType);
-    ~WmSplitter();
+    virtual ~WmSplitter();
 
     WmSplitterType splitterType();
+    void splitterType(WmSplitterType splitterType);
 
-    virtual size_t size();
-    void add(std::shared_ptr<WmFrame> frame) override;
-    void remove(WmFrame* frame) override;
     void relocate(int x, int y, int width, int height) override;
 
     virtual WmFrameType containerType();

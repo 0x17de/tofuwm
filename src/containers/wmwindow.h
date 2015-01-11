@@ -23,7 +23,7 @@ public:
     WindowMode windowMode = WindowMode::Floating;
 
     WmWindow(WindowManager* wm, Window window);
-    ~WmWindow();
+    virtual ~WmWindow();
     std::shared_ptr<WmWindow> shared();
 
     virtual WmFrameType containerType();

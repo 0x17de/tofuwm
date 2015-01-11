@@ -10,6 +10,9 @@ void WindowManager::onEnterNotify() {
         return;
 
     setCurrentWindow(event.xcrossing.window);
+    if (!currentWindow)
+        return;
+
     currentWindow->setActive(true);
     if (currentWindow->windowMode == WindowMode::Tiled)
         currentWorkspace->lastActiveTiledWindow = currentWindow;
@@ -67,4 +70,8 @@ void WindowManager::onUnmapNotify() {
 
     if (w == currentWindow)
         selectNewCurrentWindow();
+}
+
+void WindowManager::onPropertyNotify() {
+    // @TODO: Actions
 }

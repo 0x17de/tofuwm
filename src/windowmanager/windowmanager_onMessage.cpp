@@ -9,6 +9,8 @@ using namespace std;
 
 /*
 @TODO: Check for more required messages
+http://standards.freedesktop.org/wm-spec/wm-spec-1.3.html
+
 _NET_ACTIVE_WINDOW
 
 _NET_SUPPORTED

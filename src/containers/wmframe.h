@@ -18,6 +18,9 @@ private:
     Geometry geometry_ = {-1, -1, -1, -1};
     WmContainer* parent_ = 0;
 public:
+    WmFrame();
+    virtual ~WmFrame();
+
     virtual WmFrameType containerType() = 0;
     virtual void realign();
     virtual void relocate(int x, int y, int width, int height) = 0;

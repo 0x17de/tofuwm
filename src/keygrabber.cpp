@@ -1,4 +1,5 @@
 #include <sstream>
+#include <containers/wmsplitter.h>
 #include "keygrabber.h"
 #include "windowmanager/windowmanager.h"
 
@@ -25,6 +26,12 @@ workspaceCount(workspaceCount)
             [=] { wm->onMouseRelease(); },
             [=] { wm->onMouseMotion(); });
 
+    // Change tiling mode (horizontal/vertical)
+    hotkeys.emplace_back(wm->display, wm->root,
+            key("w"), defaultModifier,
+            [=] {
+                wm->changeSplitterDirectionOfWindow(wm->currentWindow);
+            }, nullptr);
     // Toggle window mode (tiling/floating)
     hotkeys.emplace_back(wm->display, wm->root,
             key("e"), defaultModifier,
