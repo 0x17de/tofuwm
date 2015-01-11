@@ -81,7 +81,7 @@ WmWindow* WindowManager::addWindow(Window window) {
     windows.insert(make_pair(w->window, wPtr));
     windows.insert(make_pair(w->frame, wPtr));
 
-    w->setWorkspace(currentWorkspace);
+    currentWorkspace->addWindow(w);
 
     stringstream ss;
     ss << desktop.x << ":" << desktop.w << ":" << desktop.y << ":" << desktop.h;
@@ -102,6 +102,41 @@ WmWindow* WindowManager::addWindow(Window window) {
             attributes.width, attributes.height);
 
     return w;
+}
+
+void WindowManager::removeDestroyedWindow(Window w) {
+    WmWindow* destroyedWindow;
+    if (currentWindow && currentWindow->window == w)
+        destroyedWindow = currentWindow;
+    else
+        destroyedWindow = findWindow(w);
+
+    if (!destroyedWindow)
+        return;
+
+    destroyedWindow->window = 0;
+
+    removeWindow(destroyedWindow);
+}
+
+void WindowManager::removeWindow(WmWindow* w) {
+    if (w == currentWorkspace->lastActiveTiledWindow)
+        currentWorkspace->lastActiveTiledWindow = 0; // @TODO: Select next best tiled window
+
+    w->workspace->removeWindow(w); // remove from tiling
+
+    // Cleanup struct
+    auto it = windows.find(w->window);
+    if (it != windows.end())
+        windows.erase(it);
+    auto it2 = windows.find(w->frame);
+    if (it2 != windows.end())
+        windows.erase(it2);
+
+    if (currentWindow == w) {
+        currentWindow = 0;
+        selectNewCurrentWindow();
+    }
 }
 
 void WindowManager::setCurrentWindow(Window window) {
@@ -133,8 +168,10 @@ void WindowManager::changeWorkspace(int number) {
 
     currentWorkspace->hide();
     currentWorkspace = &workspaces[number];
-    if (moveWindow)
-        moveWindow->setWorkspace(currentWorkspace);
+    if (moveWindow) {
+        moveWindow->workspace->removeWindow(moveWindow);
+        currentWorkspace->addWindow(moveWindow);
+    }
     currentWorkspace->show();
 
     selectNewCurrentWindow();

@@ -21,6 +21,7 @@ public:
     Window frame;
     Workspace* workspace = 0;
     WindowMode windowMode = WindowMode::Floating;
+    bool isMapped = false;
 
     WmWindow(WindowManager* wm, Window window);
     virtual ~WmWindow();
@@ -32,7 +33,6 @@ public:
     void hide();
     int minWindowSize();
     void setActive(bool active);
-    void setWorkspace(Workspace* newWorkspace);
     bool staysFloating();
     void toggleFloating();
     bool supportsProtocol(Atom protocol) throw ();

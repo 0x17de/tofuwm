@@ -19,15 +19,15 @@ WmWindow::WmWindow(WindowManager* wm, Window window) :
     frame = XCreateSimpleWindow(wm->display, wm->root, wAttr.x - 2, wAttr.y - 2, wAttr.width + 4, wAttr.height + 4, 0, 0, 0xff00ff);
     XReparentWindow(wm->display, window, frame, 2, 2);
     XMapWindow(wm->display, frame);
+    isMapped = true;
 }
 
 WmWindow::~WmWindow() {
     selectNoInput();
-    setWorkspace(0);
-    XWindowAttributes wAttr;
-    XGetWindowAttributes(wm->display, frame, &wAttr);
-    if (window)
-        XReparentWindow(wm->display, window, wm->root, wAttr.x, wAttr.y);
+    //XWindowAttributes wAttr;
+    //XGetWindowAttributes(wm->display, frame, &wAttr);
+    if (window && isMapped)
+        XReparentWindow(wm->display, window, wm->root, 0, 0);
     XDestroyWindow(wm->display, frame);
 }
 
@@ -50,14 +50,6 @@ void WmWindow::show() {
 void WmWindow::setActive(bool active) {
     XSetWindowBackground(wm->display, frame, active ? 0x00ff00 : 0xff0000);
     XClearWindow(wm->display, frame);
-}
-
-void WmWindow::setWorkspace(Workspace* newWorkspace) {
-    if (workspace)
-        workspace->removeWindow(this);
-    workspace = newWorkspace;
-    if (newWorkspace)
-        workspace->addWindow(this);
 }
 
 bool WmWindow::staysFloating() {
@@ -114,6 +106,8 @@ void WmWindow::relocate(int x, int y, int w, int h, unsigned int event_mask) {
     stringstream ss;
     ss << "RELOC " << window << ": " << x << ":" << y << ":" << w << ":" << h;
     wm->addDebugText(ss.str());
+
+    event_mask = CWX | CWY | CWHeight | CWWidth; // @TODO: DEBUG override
 
     XWindowChanges xchanges;
     xchanges.width = max(minWindowSize(), w - 4);

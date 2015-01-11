@@ -38,6 +38,9 @@ void Workspace::show() {
 }
 
 void Workspace::addWindow(WmWindow* w) {
+    if (w->workspace)
+        w->workspace->removeWindow(w);
+    w->workspace = this;
     if (workspaceMode_ == WorkspaceMode::Floating || w->staysFloating()) {
         w->windowMode = WindowMode::Floating;
         floatingWindows.push_back(w);
@@ -136,12 +139,15 @@ WmContainer* Workspace::checkCleanContainer(WmContainer *container) {
 }
 
 void Workspace::removeWindow(WmWindow* w) {
+    if (!w) return;
     switch (w->windowMode) {
         case WindowMode::Floating:
-            floatingWindows.remove(w);
+            if (floatingWindows.size() > 0)
+                floatingWindows.remove(w);
             break;
         case WindowMode::Tiled:
-            windows.remove(w);
+            if (windows.size() > 0)
+                windows.remove(w);
             if (lastActiveTiledWindow == w)
                 lastActiveTiledWindow = 0;
             WmContainer* container = w->parent();
@@ -152,6 +158,7 @@ void Workspace::removeWindow(WmWindow* w) {
                 toAlign->realign();
             break;
     }
+    w->workspace = 0;
     if (w == lastActiveTiledWindow)
         lastActiveTiledWindow = 0;
 }

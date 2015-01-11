@@ -4,6 +4,7 @@
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
 #include <X11/cursorfont.h>
+#include <sstream>
 
 #include "windowmanager.h"
 
@@ -12,6 +13,7 @@ using namespace std;
 
 
 void WindowManager::run() {
+    //setErrorHandler();
     setWmName();
     initCursor();
     initBackground();
@@ -20,6 +22,18 @@ void WindowManager::run() {
     selectDefaultInput();
     calculateDesktopSpace(); // Find docked windows.
     loop();
+}
+
+static int windowManagerErrorHandler(Display* display, XErrorEvent* event) {
+    char buffer[4096];
+    XGetErrorText(display, event->error_code, buffer, sizeof(buffer));
+
+    stringstream ss;
+    ss << "Error: " << buffer;
+    throw runtime_error(ss.str());
+}
+void WindowManager::setErrorHandler() {
+    XSetErrorHandler(windowManagerErrorHandler);
 }
 
 void WindowManager::setWmName() {
@@ -57,7 +71,7 @@ void WindowManager::addExistingWindows() throw() {
 
     for (int i = 0; i < numberOfChildren; ++i) {
         WmWindow* w = addWindow(children[i]);
-        w->setWorkspace(currentWorkspace);
+        currentWorkspace->addWindow(w);
     }
 
     XFree(children);

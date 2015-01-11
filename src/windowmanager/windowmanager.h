@@ -18,12 +18,19 @@ class WindowManager {
 private:
     bool running = true;
     std::list<std::string> debugStrings;
+    std::string wmname = "tofuwm";
+
+    std::shared_ptr<Display> displayPtr;
+public:
+    Display* display;
+    Window root;
+    std::shared_ptr<KeyGrabber> keyGrabber;
+    std::shared_ptr<FontHelper> fontHelper;
 
     // Viewport
 public:
     Geometry desktop; // For using docks, blocked areas
 private:
-    std::list<std::shared_ptr<WmWindow>> dockedWindows;
 
     // Move window
     WmWindow* moveWindow = 0;
@@ -33,28 +40,18 @@ private:
     bool moveWindowExpandXPositive;
     bool moveWindowExpandYPositive;
 
-    // Default
-public:
-    Display* display;
-    Window root;
-
-private:
-    std::string wmname = "tofuwm";
     Cursor cursor;
     XEvent event;
 
-    std::shared_ptr<Display> displayPtr;
-    std::shared_ptr<KeyGrabber> keyGrabber;
-    std::shared_ptr<FontHelper> fontHelper;
-
     WmWindow* currentWindow = 0;
-    std::map<Window, std::shared_ptr<WmWindow>> windows;
-
-    // Workspaces
     std::vector<Workspace> workspaces;
     Workspace* currentWorkspace;
 
+    std::map<Window, std::shared_ptr<WmWindow>> windows;
+    std::list<std::shared_ptr<WmWindow>> dockedWindows;
+
     // === Methods
+    void setErrorHandler();
     void setWmName();
     void initCursor();
     void initBackground();
@@ -67,6 +64,8 @@ private:
     void calculateDesktopSpace();
     void spawn(const std::string& cmd, char *const argv[]);
     WmWindow* addWindow(Window window);
+    void removeDestroyedWindow(Window window);
+    void removeWindow(WmWindow* window);
     WmWindow* findWindow(Window window);
     void selectNewCurrentWindow();
     void changeSplitterDirectionOfWindow(WmWindow* window);
