@@ -107,33 +107,27 @@ void WmWindow::relocate(int x, int y, int w, int h, unsigned int event_mask) {
     ss << "RELOC " << window << ": " << x << ":" << y << ":" << w << ":" << h;
     wm->addDebugText(ss.str());
 
-    event_mask = CWX | CWY | CWHeight | CWWidth; // @TODO: DEBUG override
+    // We don't care about other masks
+    event_mask &= CWX | CWY | CWWidth | CWHeight;
+    unsigned int event_mask_window = event_mask & (CWWidth | CWHeight);
 
     XWindowChanges xchanges;
-    xchanges.width = max(minWindowSize(), w - 4);
-    xchanges.height = max(minWindowSize(), h - 4);
-    XConfigureWindow(wm->display, window, event_mask &~ (CWX | CWY), &xchanges);
-    xchanges.x = x;
-    xchanges.y = y;
-    xchanges.width += 4;
-    xchanges.height += 4;
-    XConfigureWindow(wm->display, frame, event_mask, &xchanges);
+    if (event_mask_window) {
+        xchanges.width = max(minWindowSize(), w - 4);
+        xchanges.height = max(minWindowSize(), h - 4);
+        XConfigureWindow(wm->display, window, event_mask & ~(CWX | CWY), &xchanges);
+    }
+    if (event_mask) {
+        xchanges.x = x;
+        xchanges.y = y;
+        xchanges.width += 4;
+        xchanges.height += 4;
+        XConfigureWindow(wm->display, frame, event_mask, &xchanges);
+    }
 }
 
 void WmWindow::relocate(int x, int y, int w, int h) {
-    stringstream ss;
-    ss << "RELOC " << window << ": " << x << ":" << y << ":" << w << ":" << h;
-    wm->addDebugText(ss.str());
-
-    XWindowChanges xchanges;
-    xchanges.width = max(minWindowSize(), w - 4);
-    xchanges.height = max(minWindowSize(), h - 4);
-    XConfigureWindow(wm->display, window, CWWidth|CWHeight, &xchanges);
-    xchanges.x = x;
-    xchanges.y = y;
-    xchanges.width += 4;
-    xchanges.height += 4;
-    XConfigureWindow(wm->display, frame, CWX|CWY|CWWidth|CWHeight, &xchanges);
+    relocate(x, y, w, h, CWX | CWY | CWHeight | CWWidth);
 }
 
 void WmWindow::close() {
