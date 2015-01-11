@@ -20,6 +20,7 @@ public:
     ~Workspace();
 
     WorkspaceMode workspaceMode();
+    void workspaceMode(WorkspaceMode workspaceMode);
     void hide();
     void show();
 

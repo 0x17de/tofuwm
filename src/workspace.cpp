@@ -14,6 +14,10 @@ WorkspaceMode Workspace::workspaceMode() {
     return workspaceMode_;
 }
 
+void Workspace::workspaceMode(WorkspaceMode workspaceMode) {
+    workspaceMode_ = workspaceMode;
+}
+
 void Workspace::hide() {
     for(WmWindow* w : windows)
         w->hide();
