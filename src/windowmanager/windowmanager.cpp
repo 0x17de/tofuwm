@@ -67,6 +67,7 @@ void WindowManager::changeSplitterDirectionOfWindow(WmWindow *window) {
                     splitter->add(newSplitter, window);
                     splitter->remove(window);
                     newSplitter->add(window->shared());
+                    newSplitter->splitRatio(window->splitRatio());
                     splitter->realign();
                 }
                 break;
