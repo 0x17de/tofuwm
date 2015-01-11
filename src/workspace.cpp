@@ -10,6 +10,10 @@ Workspace::Workspace() {
 Workspace::~Workspace() {
 }
 
+WorkspaceMode Workspace::workspaceMode() {
+    return workspaceMode_;
+}
+
 void Workspace::hide() {
     for(WmWindow* w : windows)
         w->hide();

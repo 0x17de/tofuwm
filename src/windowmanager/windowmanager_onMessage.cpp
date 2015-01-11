@@ -8,6 +8,9 @@ using namespace std;
 
 
 /*
+@TODO: Check for more required messages
+_NET_ACTIVE_WINDOW
+
 _NET_SUPPORTED
 _NET_CLIENT_LIST
 _NET_NUMBER_OF_DESKTOPS
@@ -15,7 +18,6 @@ _NET_DESKTOP_GEOMETRY
 _NET_DESKTOP_VIEWPORT
 _NET_CURRENT_DESKTOP
 _NET_DESKTOP_NAMES
-_NET_ACTIVE_WINDOW
 _NET_WORKAREA
 _NET_SUPPORTING_WM_CHECK
 _NET_VIRTUAL_ROOTS
@@ -43,6 +45,7 @@ void WindowManager::onClientMessage() {
 }
 
 void WindowManager::onNetWmState() {
+    // @TODO: onNetWmState
 }
 
 void WindowManager::onNetRequestFrameExtents() {
@@ -56,4 +59,5 @@ void WindowManager::onNetRequestFrameExtents() {
 }
 
 void WindowManager::onNetRequestActiveWindow() {
+    // @TODO: onNetRequestActiveWindow
 }
