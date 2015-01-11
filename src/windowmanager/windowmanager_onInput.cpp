@@ -73,6 +73,8 @@ void WindowManager::onMotion() {
 void WindowManager::onMousePress() {
     if (event.xbutton.subwindow) {
         moveWindow = findWindow(event.xbutton.subwindow);
+        if (moveWindow->windowMode == WindowMode::Tiled)
+            moveWindow = 0;
         if (!moveWindow)
             return;
 

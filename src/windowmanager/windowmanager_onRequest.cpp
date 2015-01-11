@@ -22,8 +22,10 @@ void WindowManager::onConfigureRequest() {
         addDebugText(ss.str());
 
         WmWindow* w = findWindow(event.xconfigurerequest.window);
-        if (w && w->window == event.xconfigurerequest.window)
-            w->relocate(event.xconfigurerequest.x, event.xconfigurerequest.y, event.xconfigurerequest.width, event.xconfigurerequest.height);
+        if (w && w->window == event.xconfigurerequest.window) {
+            if (w->windowMode == WindowMode::Floating)
+                w->relocate(event.xconfigurerequest.x, event.xconfigurerequest.y, event.xconfigurerequest.width, event.xconfigurerequest.height);
+        }
     }
 }
 
@@ -34,8 +36,10 @@ void WindowManager::onResizeRequest() { // @TODO: fix resize request
         addDebugText(ss.str());
 
         WmWindow* w = findWindow(event.xresizerequest.window);
-        if (w && w->window == event.xresizerequest.window)
-            w->resize(event.xresizerequest.width, event.xresizerequest.height);
+        if (w && w->window == event.xresizerequest.window) {
+            if (w->windowMode == WindowMode::Floating)
+                w->resize(event.xresizerequest.width, event.xresizerequest.height);
+        }
     }
 }
 
