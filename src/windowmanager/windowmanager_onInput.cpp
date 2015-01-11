@@ -33,7 +33,7 @@ void WindowManager::onKeyPress() {
 void WindowManager::onKeyRelease() {
     for (WmHotkey& hotkey : keyGrabber->hotkeys) {
         if (event.xkey.state == hotkey.modifier()
-                && event.xkey.keycode == hotkey.keyCode()) {
+         && event.xkey.keycode == hotkey.keyCode()) {
             hotkey.onRelease();
         }
     }
