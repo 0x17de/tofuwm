@@ -41,7 +41,7 @@ void WmContainer::add(std::shared_ptr<WmFrame> frame, WmFrame* after) {
         // Try to insert after specified element
         for (auto it = begin(children_); it != end(children_); ++it) {
             if (it->get() == after) {
-                ++it; // To make it insert after it.
+                ++it; // To insert after it.
                 children_.insert(it, frame);
                 return;
             }
