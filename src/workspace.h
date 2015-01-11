@@ -38,6 +38,9 @@ public:
     void hide();
     void show();
 
+    void sendWindowToFront(WmWindow* w);
+    void sendWindowToBack(WmWindow* w);
+
     void addWindow(WmWindow* w);
     void removeWindow(WmWindow* w);
     WmContainer* checkCleanContainer(WmContainer* container);

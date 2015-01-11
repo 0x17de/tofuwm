@@ -80,7 +80,10 @@ void WindowManager::onMousePress() {
         setCurrentWindow(moveWindow);
         XGetWindowAttributes(display, moveWindow->frame, &moveWindowAttributes);
         moveWindowStart = event.xbutton;
-        XRaiseWindow(display, moveWindow->frame);
+
+        if (moveWindow->windowMode == WindowMode::Floating)
+            XRaiseWindow(display, moveWindow->frame);
+
         if (moveWindowStart.button == 3) { // Right mouse
             moveWindowExpandXPositive = moveWindowStart.x_root >= moveWindowAttributes.x + moveWindowAttributes.width / 2;
             moveWindowExpandYPositive = moveWindowStart.y_root >= moveWindowAttributes.y + moveWindowAttributes.height / 2;

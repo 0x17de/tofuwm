@@ -1,4 +1,5 @@
 #include <containers/wmsplitter.h>
+#include <X11/Xlib.h>
 #include "workspace.h"
 #include "windowmanager/windowmanager.h"
 
@@ -41,6 +42,7 @@ void Workspace::addWindow(WmWindow* w) {
         w->windowMode = WindowMode::Floating;
         floatingWindows.push_back(w);
         wm->setCurrentWindow(w);
+        sendWindowToFront(w);
     } else {
         w->windowMode = WindowMode::Tiled;
         addWindowToTiling(w);
@@ -82,8 +84,23 @@ void Workspace::addWindowToTiling(WmWindow* w) {
         container = rootContainer.get();
     }
 
+    sendWindowToBack(w);
+
     container->add(w->shared(), lastActiveTiledWindow);
     container->realign();
+}
+
+void Workspace::sendWindowToFront(WmWindow* w) {
+    XWindowChanges xchanges;
+    xchanges.sibling = 0;
+    xchanges.stack_mode = Above;
+    XConfigureWindow(wm->display, w->frame, CWStackMode, &xchanges);
+}
+void Workspace::sendWindowToBack(WmWindow* w) {
+    XWindowChanges xchanges;
+    xchanges.sibling = 0;
+    xchanges.stack_mode = Below;
+    XConfigureWindow(wm->display, w->frame, CWStackMode, &xchanges);
 }
 
 void Workspace::toggleWindowMode(WmWindow* w) {
@@ -97,6 +114,7 @@ void Workspace::toggleWindowMode(WmWindow* w) {
         w->windowMode = WindowMode::Floating;
         windows.remove(w);
         floatingWindows.push_back(w);
+        sendWindowToFront(w);
         if (lastActiveTiledWindow == w)
             lastActiveTiledWindow = 0;
     }
@@ -108,7 +126,7 @@ WmContainer* Workspace::checkCleanContainer(WmContainer *container) {
 
     WmContainer* parent = container->parent();
     if (parent != 0) {
-        parent ->remove(container);
+        parent->remove(container);
         return checkCleanContainer(parent);
     }
 
