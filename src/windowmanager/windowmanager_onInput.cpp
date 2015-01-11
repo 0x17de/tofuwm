@@ -1,6 +1,4 @@
 #include <iostream>
-#include <sstream>
-#include <cmath>
 #include <X11/Xlib.h>
 #include "windowmanager.h"
 
@@ -24,34 +22,21 @@ void WindowManager::onMotion() {
 }
 
 void WindowManager::onKeyPress() {
-    if (event.xkey.state & keyGrabber->defaultModifier()) {
-        if (event.xkey.state & ShiftMask) {
-            if (event.xkey.keycode == keyGrabber->keyClose()) {
-                addDebugText("WINDOW CLOSE");
-                if (currentWindow)
-                    currentWindow->close();
-                selectNewCurrentWindow();
-            }
-        } else {
-            if (event.xkey.keycode == keyGrabber->keyDMenu()) {
-                addDebugText("DMENU SPAWN");
-                char *const parmList[] = {(char *) "dmenu_run", 0};
-                spawn("/usr/bin/dmenu_run", parmList);
-            } else {
-                for (int i = 0; i < workspaceCount(); ++i) {
-                    if (event.xkey.keycode == keyGrabber->keyWorkspace(i)) {
-                        stringstream ss;
-                        ss << "WORKSPACE " << (i+1);
-                        addDebugText(ss.str());
-                        changeWorkspace(i);
-                    }
-                }
-            }
+    for (WmHotkey& hotkey : keyGrabber->hotkeys) {
+        if (event.xkey.state == hotkey.modifier()
+         && event.xkey.keycode == hotkey.keyCode()) {
+            hotkey.onPress();
         }
     }
 }
 
 void WindowManager::onKeyRelease() {
+    for (WmHotkey& hotkey : keyGrabber->hotkeys) {
+        if (event.xkey.state == hotkey.modifier()
+                && event.xkey.keycode == hotkey.keyCode()) {
+            hotkey.onRelease();
+        }
+    }
 }
 
 void WindowManager::onButtonPress() {

@@ -5,16 +5,16 @@
 #include <X11/Xlib.h>
 #include "wmhotkey.h"
 
+class WindowManager;
 class KeyGrabber {
-    Display* display;
-    Window root;
+    WindowManager* wm;
     int workspaceCount;
 
+public:
     std::list<WmHotbutton> hotbuttons;
     std::list<WmHotkey> hotkeys;
 
-public:
-    KeyGrabber(Display* display, int workspaceCount);
+    KeyGrabber(WindowManager* wm, int workspaceCount);
     ~KeyGrabber();
 
     int defaultModifier();

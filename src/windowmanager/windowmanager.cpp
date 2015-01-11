@@ -20,7 +20,7 @@ workspaces(workspaceCount())
     display = displayPtr.get();
     root = XDefaultRootWindow(display);
 
-    keyGrabber = make_shared<KeyGrabber>(display, workspaceCount());
+    keyGrabber = make_shared<KeyGrabber>(this, workspaceCount());
     fontHelper = make_shared<FontHelper>(display);
 
     currentWorkspace = &workspaces[0];

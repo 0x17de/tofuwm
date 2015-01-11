@@ -116,6 +116,8 @@ public:
     ~WindowManager();
 
     void run();
+
+    friend KeyGrabber;
 };
 
 #endif // WINDOWMANAGER_H
