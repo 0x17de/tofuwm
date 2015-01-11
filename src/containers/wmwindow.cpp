@@ -17,16 +17,7 @@ WmWindow::WmWindow(WindowManager* wm, Window window) :
     XGetWindowAttributes(wm->display, window, &wAttr);
 
     frame = XCreateSimpleWindow(wm->display, wm->root, wAttr.x - 2, wAttr.y - 2, wAttr.width + 4, wAttr.height + 4, 0, 0, 0xff00ff);
-
-    // No event during remapping
-    XSetWindowAttributes attributes;
-    attributes.override_redirect = 1;
-    attributes.event_mask = 0;
-    XChangeWindowAttributes(wm->display, frame, CWEventMask | CWOverrideRedirect, &attributes);
-
-    XMapWindow(wm->display, frame);
-    XReparentWindow(wm->display, window, frame, 2, 2);
-    isMapped = true;
+    map();
 
     setDefaultEventMask();
 }
@@ -38,6 +29,23 @@ WmWindow::~WmWindow() {
         XReparentWindow(wm->display, window, wm->root, wAttr.x, wAttr.y);
     XDestroyWindow(wm->display, frame);
 }
+
+void WmWindow::map() {
+    setSubstructureEvents(false);
+    XMapWindow(wm->display, frame);
+    XMapWindow(wm->display, window);
+    XReparentWindow(wm->display, window, frame, 2, 2);
+    isMapped = true;
+    setSubstructureEvents(true);
+}
+
+void WmWindow::setSubstructureEvents(bool enable) {
+        // No event during remapping
+        XSetWindowAttributes attributes;
+        attributes.override_redirect = 1;
+        attributes.event_mask = enable ? SubstructureRedirectMask | EnterWindowMask | LeaveWindowMask : 0;
+        XChangeWindowAttributes(wm->display, frame, CWEventMask | CWOverrideRedirect, &attributes);
+};
 
 std::shared_ptr<WmWindow> WmWindow::shared() {
     return shared_from_this();

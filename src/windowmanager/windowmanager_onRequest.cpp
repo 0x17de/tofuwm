@@ -9,7 +9,12 @@ using namespace std;
 
 void WindowManager::onMapRequest() {
     if (event.xmaprequest.parent == root) {
-        addWindow(event.xmaprequest.window);
+        WmWindow* candidate = findWindow(event.xmaprequest.window);
+        if (!candidate) { // If unknown: add
+            addWindow(event.xmaprequest.window);
+        } else {
+            candidate->map();
+        }
     } else {
         XMapWindow(display, event.xmaprequest.window);
     }

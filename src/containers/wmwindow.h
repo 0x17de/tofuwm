@@ -30,11 +30,13 @@ public:
 
     void show();
     void hide();
+    void map();
     int minWindowSize();
     void setActive(bool active);
     bool supportsProtocol(Atom protocol) throw ();
     void close();
     void setDefaultEventMask();
+    void setSubstructureEvents(bool enable);
 
     void resize(int w, int h);
     virtual void realign();

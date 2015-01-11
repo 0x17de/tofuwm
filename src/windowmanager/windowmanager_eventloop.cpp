@@ -76,6 +76,9 @@ void WindowManager::loop() {
             case ClientMessage:
                 addDebugText("EVENT ClientMessage", LogLevel::VeryVerbose);
                 onClientMessage(); break;
+            case PropertyNotify:
+                addDebugText("EVENT PropertyNotify", LogLevel::VeryVerbose);
+                onPropertyNotify(); break;
         }
         printDebugText();
     }
