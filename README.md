@@ -1,4 +1,6 @@
 # tofuwm
+![tofuwm Logo](http://www.icetruck.de/0/pics/tofu6s.png)
+
 A simple windowmanager initially based on tinywm. It is planned to have both tiling and floating workspaces.
 
 Preview videos:
