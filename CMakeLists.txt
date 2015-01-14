@@ -21,6 +21,7 @@ set(SOURCE_FILES
     src/wmhotkey.cpp src/wmhotkey.h
     src/display.h
     src/geometry.h
+    src/options.cpp src/options.h
     src/workspace.cpp src/workspace.h
     src/fonthelper.cpp src/fonthelper.h
     src/containers/wmwindow.cpp src/containers/wmwindow.h
