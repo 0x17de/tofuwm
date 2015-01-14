@@ -41,14 +41,14 @@ struct Options {
         try {
             vector<char *> args(argv+1, argv + argc);
             for (auto it = begin(args); it != end(args); ++it) {
-                auto nextParameter = [&] {
+                auto nextParameter = [&] (const char* errorMessage) {
                     ++it; // Next parameter
                     if (it == args.end())
-                        throw out_of_range("--restartHelper requires the process id of the old process.");
+                        throw out_of_range(errorMessage);
                 };
                 if (*it == "--restartHelper") {
                     restartHelper = true;
-                    nextParameter();
+                    nextParameter("--restartHelper requires the process id of the old process.");
                     istringstream is(*it);
                     is >> options.oldProcessPid;
                 } else if (*it == "--restart") {
