@@ -6,20 +6,20 @@ using namespace std;
 
 
 void WindowManager::onEnterNotify() {
-    if (event.xcrossing.mode != NotifyNormal || moveWindow)
+    if (event_.xcrossing.mode != NotifyNormal || moveWindow_)
         return;
 
-    setCurrentWindow(event.xcrossing.window);
-    if (!currentWindow)
+    setCurrentWindow(event_.xcrossing.window);
+    if (!currentWindow_)
         return;
 
-    currentWindow->setActive(true);
-    if (currentWindow->windowMode == WindowMode::Tiled)
-        currentWorkspace->lastActiveTiledWindow = currentWindow;
+    currentWindow_->setActive(true);
+    if (currentWindow_->windowMode == WindowMode::Tiled)
+        currentWorkspace_->lastActiveTiledWindow = currentWindow_;
 }
 
 void WindowManager::onLeaveNotify() {
-    if (event.xcrossing.mode != NotifyNormal || moveWindow)
+    if (event_.xcrossing.mode != NotifyNormal || moveWindow_)
         return;
     setCurrentWindow(nullptr);
 }
@@ -31,7 +31,7 @@ void WindowManager::onConfigureNotify() {
 }
 
 void WindowManager::onDestroyNotify() {
-    removeDestroyedWindow(event.xdestroywindow.window);
+    removeDestroyedWindow(event_.xdestroywindow.window);
 }
 
 void WindowManager::onGravityNotify() {
@@ -41,22 +41,22 @@ void WindowManager::onReparentNotify() {
 }
 
 void WindowManager::onMapNotify() {
-    WmWindow* w = findWindow(event.xunmap.window);
+    WmWindow* w = findWindow(event_.xunmap.window);
     if (!w) return;
     w->isMapped = true;
 }
 
 void WindowManager::onUnmapNotify() {
-    WmWindow* w = findWindow(event.xunmap.window);
+    WmWindow* w = findWindow(event_.xunmap.window);
     if (!w
-     || w->frame == event.xunmap.window
-     || w->window != event.xunmap.window)
+     || w->frame == event_.xunmap.window
+     || w->window != event_.xunmap.window)
         return;
 
     w->isMapped = false;
     removeWindow(w);
 
-    if (w == currentWindow)
+    if (w == currentWindow_)
         selectNewCurrentWindow();
 }
 

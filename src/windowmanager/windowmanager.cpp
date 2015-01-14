@@ -13,19 +13,21 @@
 using namespace std;
 
 
-WindowManager::WindowManager()
+WindowManager::WindowManager(const Options* const options)
+:
+    options_(options)
 {
-    displayPtr = shared_ptr<Display>(XOpenDisplay(0), Free_XCloseDisplay());
-    if (!displayPtr) throw runtime_error("Display is not open");
-    display = displayPtr.get();
+    displayPtr_ = shared_ptr<Display>(XOpenDisplay(0), Free_XCloseDisplay());
+    if (!displayPtr_) throw runtime_error("Display is not open");
+    display = displayPtr_.get();
     root = XDefaultRootWindow(display);
 
     keyGrabber = make_shared<KeyGrabber>(this, workspaceCount());
     fontHelper = make_shared<FontHelper>(display);
 
     for (int i = 0; i < workspaceCount(); ++i)
-        workspaces.emplace_back(this);
-    currentWorkspace = &workspaces[0];
+        workspaces_.emplace_back(this);
+    currentWorkspace_ = &workspaces_[0];
 }
 
 WindowManager::~WindowManager() {
@@ -45,8 +47,8 @@ void WindowManager::selectDefaultInput() {
 }
 
 void WindowManager::changeSplitterDirectionOfWindow(WmWindow *window) {
-    if (currentWindow && currentWindow->windowMode == WindowMode::Tiled) {
-        WmContainer *parent = currentWindow->parent();
+    if (currentWindow_ && currentWindow_->windowMode == WindowMode::Tiled) {
+        WmContainer *parent = currentWindow_->parent();
         if (!parent)
             return;
 
@@ -64,9 +66,10 @@ void WindowManager::changeSplitterDirectionOfWindow(WmWindow *window) {
                     splitter->splitterType(newType);
                 else {
                     shared_ptr<WmSplitter> newSplitter(make_shared<WmSplitter>(newType));
-                    splitter->add(newSplitter, window);
+                    currentWindow_->workspace->containers.push_back(newSplitter);
+                    splitter->add(newSplitter.get(), window);
                     splitter->remove(window);
-                    newSplitter->add(window->shared());
+                    newSplitter->add(window);
                     newSplitter->splitRatio(window->splitRatio());
                     splitter->realign();
                 }
@@ -80,26 +83,41 @@ void WindowManager::changeSplitterDirectionOfWindow(WmWindow *window) {
     }
 }
 
+void WindowManager::stop() {
+    running_ = false;
+    stopAction_ = WmStopAction::Stop;
+}
+
+void WindowManager::reload() {
+    running_ = false;
+    stopAction_ = WmStopAction::Reload;
+}
+
+void WindowManager::restart() {
+    running_ = false;
+    stopAction_ = WmStopAction::Restart;
+}
+
 WmWindow* WindowManager::addWindow(Window window) {
     shared_ptr<WmWindow> wPtr(make_shared<WmWindow>(this, window));
     WmWindow* w = wPtr.get();
-    windows.insert(make_pair(w->window, wPtr));
-    windows.insert(make_pair(w->frame, wPtr));
+    windows_.insert(make_pair(w->window, wPtr));
+    windows_.insert(make_pair(w->frame, wPtr));
 
-    currentWorkspace->addWindow(w);
+    currentWorkspace_->addWindow(w);
 
     stringstream ss;
-    ss << desktop.x << ":" << desktop.w << ":" << desktop.y << ":" << desktop.h;
+    ss << desktop_.x << ":" << desktop_.w << ":" << desktop_.y << ":" << desktop_.h;
     addDebugText(ss.str(), LogLevel::Verbose);
 
     XWindowAttributes attributes;
     XGetWindowAttributes(display, w->frame, &attributes);
 
-    if (!currentWindow)
+    if (!currentWindow_)
         setCurrentWindow(w);
 
-    w->relocate(desktop.x + (desktop.w - attributes.width) / 2,
-            desktop.y + (desktop.h - attributes.height) / 2,
+    w->relocate(desktop_.x + (desktop_.w - attributes.width) / 2,
+            desktop_.y + (desktop_.h - attributes.height) / 2,
             attributes.width, attributes.height);
 
     return w;
@@ -107,8 +125,8 @@ WmWindow* WindowManager::addWindow(Window window) {
 
 void WindowManager::removeDestroyedWindow(Window w) {
     WmWindow* destroyedWindow;
-    if (currentWindow && currentWindow->window == w)
-        destroyedWindow = currentWindow;
+    if (currentWindow_ && currentWindow_->window == w)
+        destroyedWindow = currentWindow_;
     else
         destroyedWindow = findWindow(w);
 
@@ -120,21 +138,21 @@ void WindowManager::removeDestroyedWindow(Window w) {
 }
 
 void WindowManager::removeWindow(WmWindow* w) {
-    if (w == currentWorkspace->lastActiveTiledWindow)
-        currentWorkspace->lastActiveTiledWindow = 0; // @TODO: Select next best tiled window
+    if (w == currentWorkspace_->lastActiveTiledWindow)
+        currentWorkspace_->lastActiveTiledWindow = 0; // @TODO: Select next best tiled window
 
     w->workspace->removeWindow(w); // remove from tiling
 
     // Cleanup struct
-    auto it = windows.find(w->window);
-    if (it != windows.end())
-        windows.erase(it);
-    auto it2 = windows.find(w->frame);
-    if (it2 != windows.end())
-        windows.erase(it2);
+    auto it = windows_.find(w->window);
+    if (it != windows_.end())
+        windows_.erase(it);
+    auto it2 = windows_.find(w->frame);
+    if (it2 != windows_.end())
+        windows_.erase(it2);
 
-    if (currentWindow == w) {
-        currentWindow = 0;
+    if (currentWindow_ == w) {
+        currentWindow_ = 0;
         selectNewCurrentWindow();
     }
 }
@@ -144,36 +162,35 @@ void WindowManager::setCurrentWindow(Window window) {
 }
 
 void WindowManager::setCurrentWindow(WmWindow* window) {
-    if (currentWindow)
-        currentWindow->setActive(false);
+    if (currentWindow_)
+        currentWindow_->setActive(false);
 
-    currentWindow = window;
+    currentWindow_ = window;
 
     stringstream ss;
-    ss << "CURRENT WINDOW 0x" << hex << currentWindow;
+    ss << "CURRENT WINDOW 0x" << hex << currentWindow_;
     addDebugText(ss.str(), LogLevel::Verbose);
 
-    if (currentWindow) {
-        currentWindow->setActive(true);
-        if (currentWindow->windowMode == WindowMode::Tiled)
-            currentWorkspace->lastActiveTiledWindow = currentWindow;
+    if (currentWindow_) {
+        currentWindow_->setActive(true);
+        if (currentWindow_->windowMode == WindowMode::Tiled)
+            currentWorkspace_->lastActiveTiledWindow = currentWindow_;
     }
     // @TODO: Set _NET_ACTIVE_WINDOW
 }
 
 void WindowManager::changeWorkspace(int number) {
-    if (currentWorkspace == &workspaces[number])
+    if (currentWorkspace_ == &workspaces_[number])
         return; // same workspace
     setCurrentWindow(nullptr);
 
-    currentWorkspace->hide();
-    currentWorkspace = &workspaces[number];
-    if (moveWindow) {
-        shared_ptr<WmWindow> w(moveWindow->shared());
-        moveWindow->workspace->removeWindow(moveWindow);
-        currentWorkspace->addWindow(moveWindow);
+    currentWorkspace_->hide();
+    currentWorkspace_ = &workspaces_[number];
+    if (moveWindow_) {
+        moveWindow_->workspace->removeWindow(moveWindow_);
+        currentWorkspace_->addWindow(moveWindow_);
     }
-    currentWorkspace->show();
+    currentWorkspace_->show();
 
     selectNewCurrentWindow();
     // @TODO: update _NET_CURRENT_DESKTOP, _NET_NUMBER_OF_DESKTOPS
@@ -183,14 +200,14 @@ void WindowManager::calculateDesktopSpace() {
     XWindowAttributes rAttr;
     XGetWindowAttributes(display, root, &rAttr);
 
-    Geometry& d = desktop;
+    Geometry& d = desktop_;
     d.x = rAttr.x;
     d.y = rAttr.y;
     d.w = rAttr.width;
     d.h = rAttr.height;
 
     // @TODO: docked, when: _NET_WM_WINDOW_TYPE => _NET_WM_WINDOW_TYPE_DOCK
-    for (shared_ptr<WmWindow>& w : dockedWindows) {
+    for (shared_ptr<WmWindow>& w : dockedWindows_) {
         XWindowAttributes wAttr;
         XGetWindowAttributes(display, w->window, &wAttr);
 
@@ -213,13 +230,21 @@ void WindowManager::calculateDesktopSpace() {
     }
 }
 
+std::string WindowManager::getAtomName(Atom atom) {
+    string result;
+    char* name = XGetAtomName(display, atom);
+    result = name;
+    XFree(name);
+    return result;
+}
+
 Atom WindowManager::getAtom(const std::string& protocol) {
     return XInternAtom(display, protocol.c_str(), false);
 }
 
 void WindowManager::selectNewCurrentWindow() {
-    if (currentWorkspace->windows.size() > 0)
-        setCurrentWindow(currentWorkspace->windows.front());
+    if (currentWorkspace_->windows.size() > 0)
+        setCurrentWindow(currentWorkspace_->windows.front());
     else
         setCurrentWindow(nullptr);
 }
@@ -234,8 +259,8 @@ void WindowManager::spawn(const std::string& cmd, char *const argv[]) {
 }
 
 WmWindow* WindowManager::findWindow(Window window) {
-    auto it = windows.find(window);
-    if (it == windows.end())
+    auto it = windows_.find(window);
+    if (it == windows_.end())
         return 0;
     return it->second.get();
 }

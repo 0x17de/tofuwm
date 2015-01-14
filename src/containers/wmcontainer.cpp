@@ -18,15 +18,15 @@ void WmContainer::parentContainer(WmContainer* parentContainer) {
     parentContainer_ = parentContainer;
 }
 
-std::list<std::shared_ptr<WmFrame>>& WmContainer::children() {
+std::list<WmFrame*>& WmContainer::children() {
     return children_;
 }
 
 void WmContainer::swapChildren(WmContainer* other) {
     children_.swap(other->children_);
-    for (shared_ptr<WmFrame>& child : children_)
+    for (WmFrame* child : children_)
         child->parent(this);
-    for (shared_ptr<WmFrame>& child : other->children_)
+    for (WmFrame* child : other->children_)
         child->parent(other);
 }
 
@@ -34,7 +34,7 @@ size_t WmContainer::size() {
     return children_.size();
 }
 
-void WmContainer::add(std::shared_ptr<WmFrame> frame, WmFrame* after) {
+void WmContainer::add(WmFrame* frame, WmFrame* after) {
     frame->parent(this);
 
     if (children_.size() > 0) {
@@ -49,7 +49,7 @@ void WmContainer::add(std::shared_ptr<WmFrame> frame, WmFrame* after) {
     if (after) {
         // Try to insert after specified element
         for (auto it = begin(children_); it != end(children_); ++it) {
-            if (it->get() == after) {
+            if (*it == after) {
                 ++it; // To insert after it.
                 children_.insert(it, frame);
                 return;
@@ -62,7 +62,7 @@ void WmContainer::add(std::shared_ptr<WmFrame> frame, WmFrame* after) {
 
 void WmContainer::remove(WmFrame* frame) {
     for (auto it = begin(children_); it != end(children_); ++it) {
-        if ((*it).get() == frame)
+        if (*it == frame)
             it = children_.erase(it);
     }
     frame->parent(nullptr);

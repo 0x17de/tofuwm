@@ -24,14 +24,23 @@ enum class LogLevel {
 };
 
 
+enum class WmStopAction {
+    Stop,
+    Reload,
+    Restart
+};
+
+class Options;
 class WindowManager {
 private:
-    bool running = true;
-    std::list<std::string> debugStrings;
-    std::string wmname = "tofuwm";
-    LogLevel currentLogLevel = LogLevel::Warning;
+    const Options* const options_;
+    bool running_ = true;
+    WmStopAction stopAction_ = WmStopAction::Stop;
+    std::list<std::string> debugStrings_;
+    std::string wmname_ = "tofuwm";
+    LogLevel currentLogLevel_ = LogLevel::Warning;
 
-    std::shared_ptr<Display> displayPtr;
+    std::shared_ptr<Display> displayPtr_;
 public:
     Display* display;
     Window root;
@@ -40,32 +49,38 @@ public:
 
     // Viewport
 public:
-    Geometry desktop; // For using docks, blocked areas
+    Geometry desktop_; // For using docks, blocked areas
 private:
 
     // Move window
-    WmWindow* moveWindow = 0;
-    XButtonEvent moveWindowStart = {0};
-    XWindowAttributes moveWindowAttributes = {0};
+    WmWindow* moveWindow_ = 0;
+    XButtonEvent moveWindowStart_ = {0};
+    XWindowAttributes moveWindowAttributes_ = {0};
     // Resize window
-    bool moveWindowExpandXPositive;
-    bool moveWindowExpandYPositive;
+    bool moveWindowExpandXPositive_;
+    bool moveWindowExpandYPositive_;
 
-    Cursor cursor;
-    XEvent event;
+    Cursor cursor_;
+    XEvent event_;
 
-    WmWindow* currentWindow = 0;
-    std::vector<Workspace> workspaces;
-    Workspace* currentWorkspace;
+    WmWindow* currentWindow_ = 0;
+    std::vector<Workspace> workspaces_;
+    Workspace*currentWorkspace_;
 
-    std::map<Window, std::shared_ptr<WmWindow>> windows;
-    std::list<std::shared_ptr<WmWindow>> dockedWindows;
+    std::map<Window, std::shared_ptr<WmWindow>> windows_;
+    std::list<std::shared_ptr<WmWindow>> dockedWindows_;
 
     // === Methods
+    void stop();
+    void reload();
+    void restart();
+
+    void onLoad();
     void setErrorHandler();
     void setWmName();
     void initCursor();
     void initBackground();
+
     void addExistingWindows() throw();
     void selectInput(int mask);
     void selectNoInput();
@@ -88,6 +103,7 @@ private:
 
 public:
     Atom getAtom(const std::string& protocol);
+    std::string getAtomName(Atom atom);
 
 private:
     // === Debug
@@ -127,10 +143,10 @@ private:
     void onNetRequestActiveWindow();
 
 public:
-    WindowManager();
+    WindowManager(const Options* const options);
     ~WindowManager();
 
-    void run();
+    WmStopAction run();
 
     friend class KeyGrabber;
 };

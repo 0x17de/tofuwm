@@ -26,42 +26,56 @@ workspaceCount(workspaceCount)
             [=] { wm->onMouseRelease(); },
             [=] { wm->onMouseMotion(); });
 
+    // Reload window manager
+    hotkeys.emplace_back(wm->display, wm->root,
+            key("r"), defaultModifier|ShiftMask,
+            [=] {
+                wm->reload();
+            }, nullptr);
     // Change tiling mode (horizontal/vertical)
     hotkeys.emplace_back(wm->display, wm->root,
             key("w"), defaultModifier,
             [=] {
-                wm->changeSplitterDirectionOfWindow(wm->currentWindow);
+                wm->changeSplitterDirectionOfWindow(wm->currentWindow_);
             }, nullptr);
     // Toggle window mode (tiling/floating)
     hotkeys.emplace_back(wm->display, wm->root,
             key("e"), defaultModifier,
             [=] {
-                if (wm->currentWindow)
-                    wm->currentWorkspace->toggleWindowMode(wm->currentWindow);
+                if (wm->currentWindow_)
+                    wm->currentWorkspace_->toggleWindowMode(wm->currentWindow_);
             }, nullptr);
     // Spawn dmenu
     hotkeys.emplace_back(wm->display, wm->root,
             key("d"), defaultModifier,
             [=] {
                 wm->addDebugText("DMENU SPAWN", LogLevel::Verbose);
-                char *const parmList[] = {(char *) "dmenu_run", 0};
-                wm->spawn("/usr/bin/dmenu_run", parmList);
+                char *const paramList[] = {(char *) "dmenu_run", 0};
+                wm->spawn("/usr/bin/dmenu_run", paramList);
             }, nullptr);
-    // Spawn gedit for debugging wm
+    // Spawn terminal
     hotkeys.emplace_back(wm->display, wm->root,
             key("t"), defaultModifier,
             [=] {
-                wm->addDebugText("GEDIT SPAWN", LogLevel::Verbose);
-                char *const parmList[] = {(char *) "gedit", (char*) "--new-window", 0};
-                wm->spawn("/usr/bin/gedit", parmList);
+                wm->addDebugText("URXVT SPAWN", LogLevel::Verbose);
+                char *const paramList[] = {(char *) "urxvt", 0};
+                wm->spawn("/usr/bin/urxvt", paramList);
+            }, nullptr);
+    // Lock screen
+    hotkeys.emplace_back(wm->display, wm->root,
+            key("l"), defaultModifier,
+            [=] {
+                wm->addDebugText("SLOCK SPAWN", LogLevel::Verbose);
+                char *const paramList[] = {(char *) "slock", 0};
+                wm->spawn("/usr/bin/slock", paramList);
             }, nullptr);
     // Close active window
     hotkeys.emplace_back(wm->display, wm->root,
-            key("q"), defaultModifier | ShiftMask,
+            key("q"), defaultModifier|ShiftMask,
             [=] {
                 wm->addDebugText("WINDOW CLOSE", LogLevel::Verbose);
-                if (wm->currentWindow)
-                    wm->currentWindow->close();
+                if (wm->currentWindow_)
+                    wm->currentWindow_->close();
                 wm->selectNewCurrentWindow();
             }, nullptr);
 

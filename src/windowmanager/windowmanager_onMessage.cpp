@@ -32,17 +32,17 @@ void WindowManager::onClientMessage() {
     static Atom A__NET_ACTIVE_WINDOW = getAtom("_NET_ACTIVE_WINDOW");
     static Atom A__NET_REQUEST_FRAME_EXTENTS = getAtom("_NET_REQUEST_FRAME_EXTENTS");
 
-    if (A__NET_WM_STATE == event.xclient.message_type) {
+    if (A__NET_WM_STATE == event_.xclient.message_type) {
         addDebugText("onNetWmState", LogLevel::VeryVerbose);
         onNetWmState();
-    } else if (A__NET_REQUEST_FRAME_EXTENTS == event.xclient.message_type) {
+    } else if (A__NET_REQUEST_FRAME_EXTENTS == event_.xclient.message_type) {
         addDebugText("onNetRequestFrameExtents", LogLevel::VeryVerbose);
         onNetRequestFrameExtents();
-    } else if (A__NET_ACTIVE_WINDOW == event.xclient.message_type) {
+    } else if (A__NET_ACTIVE_WINDOW == event_.xclient.message_type) {
         addDebugText("onNetRequestActiveWindow", LogLevel::VeryVerbose);
         onNetRequestActiveWindow();
     } else {
-        debugPrintUnknownAtom(event.xclient.message_type, LogLevel::Warning);
+        debugPrintUnknownAtom(event_.xclient.message_type, LogLevel::Warning);
     }
 }
 
@@ -54,7 +54,7 @@ void WindowManager::onNetRequestFrameExtents() {
     static Atom A__NET_FRAME_EXTENTS = getAtom("_NET_FRAME_EXTENTS");
 
     int32_t r[4]{2, 2, 2, 2};
-    XChangeProperty(display, event.xclient.window,
+    XChangeProperty(display, event_.xclient.window,
             A__NET_FRAME_EXTENTS, XA_CARDINAL,
             32, PropModeReplace,
             (unsigned const char*)r, 4);

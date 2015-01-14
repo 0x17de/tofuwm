@@ -12,7 +12,7 @@
 using namespace std;
 
 
-void WindowManager::run() {
+WmStopAction WindowManager::run() {
     //setErrorHandler();
     setWmName();
     initCursor();
@@ -21,7 +21,14 @@ void WindowManager::run() {
     addExistingWindows();
     selectDefaultInput();
     calculateDesktopSpace(); // Find docked windows.
+    onLoad();
     loop();
+    return stopAction_;
+}
+
+void WindowManager::onLoad() {
+    char *const paramList[] = {(char*)"feh", (char*)"--bg-fill", (char*)"/home/it/.config/bg.png", 0};
+    spawn("/usr/bin/feh", paramList);
 }
 
 static int windowManagerErrorHandler(Display* display, XErrorEvent* event) {
@@ -39,17 +46,17 @@ void WindowManager::setErrorHandler() {
 void WindowManager::setWmName() {
     XTextProperty text;
 
-    text.value = (unsigned char *) wmname.c_str();
+    text.value = (unsigned char *) wmname_.c_str();
     text.encoding = XA_STRING;
     text.format = 8;
-    text.nitems = wmname.length();
+    text.nitems = wmname_.length();
 
     XSetWMName(display, root, &text);
 }
 
 void WindowManager::initCursor() {
-    cursor = XCreateFontCursor(display, XC_arrow);
-    XDefineCursor(display, root, cursor);
+    cursor_ = XCreateFontCursor(display, XC_arrow);
+    XDefineCursor(display, root, cursor_);
 }
 
 void WindowManager::initBackground() {
@@ -71,7 +78,7 @@ void WindowManager::addExistingWindows() throw() {
 
     for (int i = 0; i < numberOfChildren; ++i) {
         WmWindow* w = addWindow(children[i]);
-        currentWorkspace->addWindow(w);
+        currentWorkspace_->addWindow(w);
     }
 
     XFree(children);

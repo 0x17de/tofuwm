@@ -64,11 +64,12 @@ std::shared_ptr<WmContainer> Workspace::createNewContainer() {
             container = make_shared<WmSplitter>(WmSplitterType::Vertical);
             break;
     }
+    containers.push_back(container);
     Geometry& g = container->geometry();
-    g.x = wm->desktop.x;
-    g.y = wm->desktop.y;
-    g.w = wm->desktop.w;
-    g.h = wm->desktop.h;
+    g.x = wm->desktop_.x;
+    g.y = wm->desktop_.y;
+    g.w = wm->desktop_.w;
+    g.h = wm->desktop_.h;
     return container;
 }
 
@@ -89,7 +90,7 @@ void Workspace::addWindowToTiling(WmWindow* w) {
 
     sendWindowToBack(w);
 
-    container->add(w->shared(), lastActiveTiledWindow);
+    container->add(w, lastActiveTiledWindow);
     container->realign();
 }
 
@@ -106,7 +107,7 @@ void Workspace::sendWindowToBack(WmWindow* w) {
     XConfigureWindow(wm->display, w->frame, CWStackMode, &xchanges);
 }
 
-void Workspace::toggleWindowMode(WmWindow* w) {
+void Workspace::toggleWindowMode(WmWindow* w) { // @TODO: tiled->float does not work correctly -> multiple add remove
     if (w->windowMode == WindowMode::Floating) {
         w->windowMode = WindowMode::Tiled;
         floatingWindows.remove(w);
@@ -115,6 +116,13 @@ void Workspace::toggleWindowMode(WmWindow* w) {
         lastActiveTiledWindow = w;
     } else {
         w->windowMode = WindowMode::Floating;
+        WmContainer* container = w->parent();
+        if (container) {
+            container->remove(w);
+            WmContainer* parent = checkCleanContainer(container);
+            if (parent)
+                parent->realign();
+        }
         windows.remove(w);
         floatingWindows.push_back(w);
         sendWindowToFront(w);
@@ -130,11 +138,19 @@ WmContainer* Workspace::checkCleanContainer(WmContainer *container) {
     WmContainer* parent = container->parent();
     if (parent != 0) {
         parent->remove(container);
+        for (auto it = begin(containers); it != end(containers); ++it) {
+            if ((*it).get() == container) {
+                it = containers.erase(it);
+                break;
+            }
+        }
+
         return checkCleanContainer(parent);
     }
 
     // no parent -> we are root container
     rootContainer.reset();
+    containers.clear(); // no containers should be available after deleting root container
     return 0; // no parent container
 }
 

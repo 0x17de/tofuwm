@@ -17,6 +17,7 @@ WmWindow::WmWindow(WindowManager* wm, Window window) :
     XGetWindowAttributes(wm->display, window, &wAttr);
 
     frame = XCreateSimpleWindow(wm->display, wm->root, wAttr.x - 2, wAttr.y - 2, wAttr.width + 4, wAttr.height + 4, 0, 0, 0xff00ff);
+    loadWindowProperties();
     map();
 
     setDefaultEventMask();
@@ -28,6 +29,41 @@ WmWindow::~WmWindow() {
     if (window && isMapped)
         XReparentWindow(wm->display, window, wm->root, wAttr.x, wAttr.y);
     XDestroyWindow(wm->display, frame);
+}
+
+void WmWindow::onPropertyChange(Atom atom, int state) {
+/*    static const Atom net_wm_window_type = wm->getAtom("_NET_WM_WINDOW_TYPE");
+    switch (atom) {
+        case net_wm_window_type:
+            break;
+    }
+    switch (state) {
+        case PropertyNewValue: // XChangeProperty
+            break;
+        case PropertyDelete: // XRotateWindowProperties
+            break;
+    }
+
+    Atom actualType;
+    int actualFormat;
+    unsigned long numberOfItems;
+    unsigned long bytes;
+    unsigned long *data;
+    int status = XGetWindowProperty(wm->display, window, atom, 0, ~0L, false, AnyPropertyType, &actualType, &actualFormat, &numberOfItems, &bytes, (unsigned char**)&data);
+
+    XFree(data);*/
+    // @TODO: Update struct data. (onPropertyChange)
+}
+
+void WmWindow::loadWindowProperties() {
+    int numberOfProperties;
+    Atom* properties = XListProperties(wm->display, window, &numberOfProperties);
+    if (!properties) return;
+
+    for (int i = 0; i < numberOfProperties; ++i)
+        onPropertyChange(properties[i], PropertyNewValue);
+
+    XFree(properties);
 }
 
 void WmWindow::map() {
@@ -46,10 +82,6 @@ void WmWindow::setSubstructureEvents(bool enable) {
         attributes.event_mask = enable ? SubstructureRedirectMask | EnterWindowMask | LeaveWindowMask : 0;
         XChangeWindowAttributes(wm->display, frame, CWEventMask | CWOverrideRedirect, &attributes);
 };
-
-std::shared_ptr<WmWindow> WmWindow::shared() {
-    return shared_from_this();
-}
 
 WmFrameType WmWindow::containerType() {
     return WmFrameType::Window;

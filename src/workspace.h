@@ -29,6 +29,7 @@ public:
     std::list<WmWindow*> windows;
     WmWindow* lastActiveTiledWindow = 0;
     std::shared_ptr<WmContainer> rootContainer;
+    std::list<std::shared_ptr<WmContainer>> containers;
 
     Workspace(WindowManager* wm);
     ~Workspace();
@@ -38,12 +39,13 @@ public:
     void hide();
     void show();
 
+    WmContainer* checkCleanContainer(WmContainer *container);
+
     void sendWindowToFront(WmWindow* w);
     void sendWindowToBack(WmWindow* w);
 
     void addWindow(WmWindow* w);
     void removeWindow(WmWindow* w);
-    WmContainer* checkCleanContainer(WmContainer* container);
     void toggleWindowMode(WmWindow* w);
 };
 

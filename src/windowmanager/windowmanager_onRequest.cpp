@@ -8,57 +8,57 @@ using namespace std;
 
 
 void WindowManager::onMapRequest() {
-    if (event.xmaprequest.parent == root) {
-        WmWindow* candidate = findWindow(event.xmaprequest.window);
+    if (event_.xmaprequest.parent == root) {
+        WmWindow* candidate = findWindow(event_.xmaprequest.window);
         if (!candidate) { // If unknown: add
-            addWindow(event.xmaprequest.window);
+            addWindow(event_.xmaprequest.window);
         } else {
             candidate->map();
         }
     } else {
-        XMapWindow(display, event.xmaprequest.window);
+        XMapWindow(display, event_.xmaprequest.window);
     }
 }
 
 void WindowManager::onConfigureRequest() {
-    if (event.xconfigurerequest.window && !moveWindow) {
+    if (event_.xconfigurerequest.window && !moveWindow_) {
         stringstream ss;
-        ss << "CONFIG WND " << event.xconfigurerequest.window;
+        ss << "CONFIG WND " << event_.xconfigurerequest.window;
         addDebugText(ss.str(), LogLevel::VeryVerbose);
 
-        WmWindow* w = findWindow(event.xconfigurerequest.window);
+        WmWindow* w = findWindow(event_.xconfigurerequest.window);
         if (w == nullptr) {
             // Not known to the window manager
             XWindowChanges xchanges;
-            xchanges.x = event.xconfigurerequest.x;
-            xchanges.y = event.xconfigurerequest.y;
-            xchanges.width = event.xconfigurerequest.width;
-            xchanges.height = event.xconfigurerequest.height;
-            xchanges.border_width = event.xconfigurerequest.border_width;
-            xchanges.sibling = event.xconfigurerequest.above;
-            xchanges.stack_mode = event.xconfigurerequest.detail;
+            xchanges.x = event_.xconfigurerequest.x;
+            xchanges.y = event_.xconfigurerequest.y;
+            xchanges.width = event_.xconfigurerequest.width;
+            xchanges.height = event_.xconfigurerequest.height;
+            xchanges.border_width = event_.xconfigurerequest.border_width;
+            xchanges.sibling = event_.xconfigurerequest.above;
+            xchanges.stack_mode = event_.xconfigurerequest.detail;
             XConfigureWindow(display, root,
-                    event.xconfigurerequest.value_mask, &xchanges);
-        } else if (w->window == event.xconfigurerequest.window) {
+                    event_.xconfigurerequest.value_mask, &xchanges);
+        } else if (w->window == event_.xconfigurerequest.window) {
             if (w->windowMode == WindowMode::Floating) {
-                w->relocate(event.xconfigurerequest.x, event.xconfigurerequest.y,
-                        event.xconfigurerequest.width, event.xconfigurerequest.height,
-                        event.xconfigurerequest.value_mask);
+                w->relocate(event_.xconfigurerequest.x, event_.xconfigurerequest.y,
+                        event_.xconfigurerequest.width, event_.xconfigurerequest.height,
+                        event_.xconfigurerequest.value_mask);
             }
         }
     }
 }
 
 void WindowManager::onResizeRequest() { // @TODO: fix resize request
-    if (event.xresizerequest.window) {
+    if (event_.xresizerequest.window) {
         stringstream ss;
-        ss << "RESIZE WND " << event.xresizerequest.window;
+        ss << "RESIZE WND " << event_.xresizerequest.window;
         addDebugText(ss.str(), LogLevel::VeryVerbose);
 
-        WmWindow* w = findWindow(event.xresizerequest.window);
-        if (w && w->window == event.xresizerequest.window) {
+        WmWindow* w = findWindow(event_.xresizerequest.window);
+        if (w && w->window == event_.xresizerequest.window) {
             if (w->windowMode == WindowMode::Floating)
-                w->resize(event.xresizerequest.width, event.xresizerequest.height);
+                w->resize(event_.xresizerequest.width, event_.xresizerequest.height);
         }
     }
 }

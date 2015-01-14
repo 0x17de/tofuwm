@@ -16,9 +16,9 @@ using namespace std;
 void WindowManager::loop() {
     // Loop
     printDebugText();
-    while(running) {
-        XNextEvent(display, &event);
-        switch (event.type) {
+    while(running_) {
+        XNextEvent(display, &event_);
+        switch (event_.type) {
             case MapRequest:
                 addDebugText("EVENT MapRequest", LogLevel::VeryVerbose);
                 onMapRequest(); break;

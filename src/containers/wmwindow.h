@@ -13,7 +13,7 @@ enum class WindowMode {
 
 class WindowManager;
 class Workspace;
-class WmWindow : public WmFrame, public std::enable_shared_from_this<WmWindow> {
+class WmWindow : public WmFrame {
 public:
     WindowManager* wm;
     Window window;
@@ -24,9 +24,11 @@ public:
 
     WmWindow(WindowManager* wm, Window window);
     virtual ~WmWindow();
-    std::shared_ptr<WmWindow> shared();
 
     virtual WmFrameType containerType();
+
+    void loadWindowProperties();
+    void onPropertyChange(Atom atom, int state);
 
     void show();
     void hide();

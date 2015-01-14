@@ -17,8 +17,8 @@ static unsigned int motionMasks =
 
 void WindowManager::onKeyPress() {
     for (WmHotkey& hotkey : keyGrabber->hotkeys) {
-        if (event.xkey.state == hotkey.modifier()
-         && event.xkey.keycode == hotkey.keyCode()) {
+        if (event_.xkey.state == hotkey.modifier()
+         && event_.xkey.keycode == hotkey.keyCode()) {
             hotkey.onPress();
             break;
         }
@@ -27,8 +27,8 @@ void WindowManager::onKeyPress() {
 
 void WindowManager::onKeyRelease() {
     for (WmHotkey& hotkey : keyGrabber->hotkeys) {
-        if (event.xkey.state == hotkey.modifier()
-         && event.xkey.keycode == hotkey.keyCode()) {
+        if (event_.xkey.state == hotkey.modifier()
+         && event_.xkey.keycode == hotkey.keyCode()) {
             hotkey.onRelease();
             break;
         }
@@ -36,11 +36,11 @@ void WindowManager::onKeyRelease() {
 }
 
 void WindowManager::onButtonPress() {
-    unsigned int state = event.xbutton.state &~ motionMasks;
+    unsigned int state = event_.xbutton.state &~ motionMasks;
 
     for (WmHotbutton& hotbutton : keyGrabber->hotbuttons) {
         if (state == hotbutton.modifier()
-         && event.xbutton.button == hotbutton.buttonCode()) {
+         && event_.xbutton.button == hotbutton.buttonCode()) {
             hotbutton.onPress();
             break;
         }
@@ -48,11 +48,11 @@ void WindowManager::onButtonPress() {
 }
 
 void WindowManager::onButtonRelease() {
-    unsigned int state = event.xbutton.state &~ motionMasks;
+    unsigned int state = event_.xbutton.state &~ motionMasks;
 
     for (WmHotbutton& hotbutton : keyGrabber->hotbuttons) {
         if (state == hotbutton.modifier()
-         && event.xbutton.button == hotbutton.buttonCode()) {
+         && event_.xbutton.button == hotbutton.buttonCode()) {
             hotbutton.onRelease();
             break;
         }
@@ -60,7 +60,7 @@ void WindowManager::onButtonRelease() {
 }
 
 void WindowManager::onMotion() {
-    unsigned int state = event.xmotion.state &~ motionMasks;
+    unsigned int state = event_.xmotion.state &~ motionMasks;
 
     for (WmHotbutton& hotbutton : keyGrabber->hotbuttons) {
         if (state == hotbutton.modifier()) {
@@ -71,45 +71,45 @@ void WindowManager::onMotion() {
 }
 
 void WindowManager::onMousePress() {
-    if (event.xbutton.subwindow) {
-        moveWindow = findWindow(event.xbutton.subwindow);
-        if (!moveWindow)
+    if (event_.xbutton.subwindow) {
+        moveWindow_ = findWindow(event_.xbutton.subwindow);
+        if (!moveWindow_)
             return;
-        if (moveWindow->windowMode == WindowMode::Tiled) {
-            moveWindow = 0;
+        if (moveWindow_->windowMode == WindowMode::Tiled) {
+            moveWindow_ = 0;
             return;
         }
 
-        setCurrentWindow(moveWindow);
-        XGetWindowAttributes(display, moveWindow->frame, &moveWindowAttributes);
-        moveWindowStart = event.xbutton;
+        setCurrentWindow(moveWindow_);
+        XGetWindowAttributes(display, moveWindow_->frame, &moveWindowAttributes_);
+        moveWindowStart_ = event_.xbutton;
 
-        if (moveWindow->windowMode == WindowMode::Floating)
-            XRaiseWindow(display, moveWindow->frame);
+        if (moveWindow_->windowMode == WindowMode::Floating)
+            XRaiseWindow(display, moveWindow_->frame);
 
-        if (moveWindowStart.button == 3) { // Right mouse
-            moveWindowExpandXPositive = moveWindowStart.x_root >= moveWindowAttributes.x + moveWindowAttributes.width / 2;
-            moveWindowExpandYPositive = moveWindowStart.y_root >= moveWindowAttributes.y + moveWindowAttributes.height / 2;
+        if (moveWindowStart_.button == 3) { // Right mouse
+            moveWindowExpandXPositive_ = moveWindowStart_.x_root >= moveWindowAttributes_.x + moveWindowAttributes_.width / 2;
+            moveWindowExpandYPositive_ = moveWindowStart_.y_root >= moveWindowAttributes_.y + moveWindowAttributes_.height / 2;
         }
     }
 }
 
 void WindowManager::onMouseRelease() {
-    if (moveWindow) {
-        moveWindowStart.subwindow = None;
-        moveWindow = nullptr;
+    if (moveWindow_) {
+        moveWindowStart_.subwindow = None;
+        moveWindow_ = nullptr;
     }
 }
 
 void WindowManager::onMouseMotion() {
-    if (moveWindow) {
-        int xdiff = event.xbutton.x_root - moveWindowStart.x_root;
-        int ydiff = event.xbutton.y_root - moveWindowStart.y_root;
-        if (moveWindowStart.button == 1) { // Left mouse
-            moveWindow->relocate(moveWindowAttributes.x + xdiff, moveWindowAttributes.y + ydiff, moveWindowAttributes.width, moveWindowAttributes.height);
-        } else if (moveWindowStart.button == 3) { // Right mouse
-            moveWindow->relocate(moveWindowAttributes.x + (moveWindowExpandXPositive ? 0 : min(xdiff, moveWindowAttributes.width)), moveWindowAttributes.y + (moveWindowExpandYPositive ? 0 : min(ydiff, moveWindowAttributes.height)),
-                    moveWindowAttributes.width + (moveWindowExpandXPositive ? xdiff : -xdiff), moveWindowAttributes.height + (moveWindowExpandYPositive ? ydiff : -ydiff));
+    if (moveWindow_) {
+        int xdiff = event_.xbutton.x_root - moveWindowStart_.x_root;
+        int ydiff = event_.xbutton.y_root - moveWindowStart_.y_root;
+        if (moveWindowStart_.button == 1) { // Left mouse
+            moveWindow_->relocate(moveWindowAttributes_.x + xdiff, moveWindowAttributes_.y + ydiff, moveWindowAttributes_.width, moveWindowAttributes_.height);
+        } else if (moveWindowStart_.button == 3) { // Right mouse
+            moveWindow_->relocate(moveWindowAttributes_.x + (moveWindowExpandXPositive_ ? 0 : min(xdiff, moveWindowAttributes_.width)), moveWindowAttributes_.y + (moveWindowExpandYPositive_ ? 0 : min(ydiff, moveWindowAttributes_.height)),
+                    moveWindowAttributes_.width + (moveWindowExpandXPositive_ ? xdiff : -xdiff), moveWindowAttributes_.height + (moveWindowExpandYPositive_ ? ydiff : -ydiff));
         }
     }
 }

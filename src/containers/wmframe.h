@@ -25,7 +25,7 @@ public:
     virtual void realign();
     virtual void relocate(int x, int y, int width, int height) = 0;
 
-    WmContainer* parent();
+    virtual WmContainer* parent();
     void parent(WmContainer* parent);
     Geometry& geometry();
     double splitRatio();

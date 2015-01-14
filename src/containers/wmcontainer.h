@@ -11,18 +11,18 @@ class WmWindow;
 
 class WmContainer : public WmFrame {
     WmContainer* parentContainer_ = 0;
-    std::list<std::shared_ptr<WmFrame>> children_;
+    std::list<WmFrame*> children_;
 public:
     WmContainer();
     virtual ~WmContainer();
 
     WmContainer* parentContainer();
     void parentContainer(WmContainer* parentContainer);
-    std::list<std::shared_ptr<WmFrame>>& children();
+    std::list<WmFrame*>& children();
     void swapChildren(WmContainer* other);
 
     size_t size();
-    void add(std::shared_ptr<WmFrame> frame, WmFrame* after = 0);
+    void add(WmFrame* frame, WmFrame* after = 0);
     void remove(WmFrame* frame);
     virtual void relocate(int x, int y, int width, int height) = 0;
     virtual WmFrameType containerType() = 0;
