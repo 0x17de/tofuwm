@@ -18,11 +18,11 @@ void prepareRestart() {
     pid_t thisPid = getpid();
     pid_t pid = fork();
 
-    stringstream ss;
-    ss << pid;
-    string thisPidString = ss.str();
-
     if (pid == 0) {
+        stringstream ss;
+        ss << pid;
+        string thisPidString = ss.str();
+
         char* programPath = getenv("_");
         char* const paramList[] = {programPath, (char*)"--restartHelper", (char*)thisPidString.c_str(), 0};
         execv(programPath, paramList);
