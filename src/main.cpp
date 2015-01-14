@@ -20,7 +20,7 @@ void prepareRestart() {
 
     if (pid == 0) {
         stringstream ss;
-        ss << pid;
+        ss << thisPid;
         string thisPidString = ss.str();
 
         char* programPath = getenv("_");
