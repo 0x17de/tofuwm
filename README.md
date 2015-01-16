@@ -17,6 +17,7 @@ A simple windowmanager initially based on tinywm. It is has both tiling and floa
 - Improved tiling hotkeys
 - Always on top windows
 - Tabbed tiles
+- Multimonitor support
 
 ## Configuration:
 Grep for *@CONFIGURE* in the program's source.
