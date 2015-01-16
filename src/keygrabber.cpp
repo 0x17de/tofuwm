@@ -28,11 +28,11 @@ workspaceCount(workspaceCount)
             [=] { wm->onMouseRelease(); },
             [=] { wm->onMouseMotion(); });
 
-    // Reload window manager
+    // Restart window manager
     hotkeys.emplace_back(wm->display, wm->root,
             key("r"), defaultModifier|ShiftMask,
             [=] {
-                wm->reload();
+                wm->restart();
             }, nullptr);
     // Change tiling mode (horizontal/vertical)
     hotkeys.emplace_back(wm->display, wm->root,

@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <cstring>
 
 
 using namespace std;
@@ -18,12 +19,12 @@ bool Options::checkOptions(int argc, char* argv[]) {
                 if (it == args.end())
                     throw out_of_range(errorMessage);
             };
-            if (*it == "--restartHelper") {
+            if (!strcmp(*it, "--restartHelper")) {
                 restartHelper = true;
                 nextParameter("--restartHelper requires the process id of the old process.");
                 istringstream is(*it);
                 is >> oldProcessPid;
-            } else if (*it == "--restart") {
+            } else if (!strcmp(*it, "--restart")) {
                 restart = true;
             }
         }

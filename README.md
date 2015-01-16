@@ -6,11 +6,14 @@ A simple windowmanager initially based on tinywm. It is has both tiling and floa
 ## Working:
 - Floating windows
 - Tiling with horizontal/vertical splitters
+- Hotkeys
 - Workspaces
+- Restart WM via hotkey (e.g. after recompiling)
 
 ## ToDo:
 - Docked windows
 - Resize and move tiles
+- List of hotkeys as window (meta4+f1 hotkey)
 - Improved tiling hotkeys
 - Always on top windows
 - Tabbed tiles
