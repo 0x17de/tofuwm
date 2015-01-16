@@ -13,6 +13,8 @@ workspaceCount(workspaceCount)
 {
     const unsigned int defaultModifier = Mod4Mask;
 
+    // @CONFIGURE: Choose hotkeys with their actions.
+
     // Move active window
     hotbuttons.emplace_back(wm->display, wm->root,
             1, defaultModifier, ButtonPressMask | ButtonReleaseMask | PointerMotionMask,

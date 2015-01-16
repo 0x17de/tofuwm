@@ -7,6 +7,7 @@
 
 struct Options {
     bool restart = false;
+    bool reload = false;
     bool restartHelper = false;
     pid_t oldProcessPid = 0;
 

@@ -75,6 +75,7 @@ private:
     void reload();
     void restart();
 
+    void onFirstLoad();
     void onLoad();
     void setErrorHandler();
     void setWmName();

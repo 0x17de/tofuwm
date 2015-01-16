@@ -5,6 +5,7 @@
 #include <X11/Xatom.h>
 #include <X11/cursorfont.h>
 #include <sstream>
+#include <options.h>
 
 #include "windowmanager.h"
 
@@ -26,7 +27,15 @@ WmStopAction WindowManager::run() {
     return stopAction_;
 }
 
+void WindowManager::onFirstLoad() {
+    if (options_->restart || options_->reload)
+        return; // Will not execute again if WindowManager was restarted.
+
+    // @CONFIGURE: Start services at boot.
+}
+
 void WindowManager::onLoad() {
+    // @CONFIGURE: Setup e.g. background.
     char *const paramList[] = {(char*)"feh", (char*)"--bg-fill", (char*)"/home/it/.config/bg.png", 0};
     spawn("/usr/bin/feh", paramList);
 }
