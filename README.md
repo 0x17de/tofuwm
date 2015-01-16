@@ -10,6 +10,7 @@ A simple windowmanager initially based on tinywm. It is has both tiling and floa
 
 ## ToDo:
 - Docked windows
+- Resize and move tiles
 - Improved tiling hotkeys
 - Always on top windows
 - Tabbed tiles
