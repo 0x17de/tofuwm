@@ -13,7 +13,6 @@ void WindowManager::onEnterNotify() {
     if (!currentWindow_)
         return;
 
-    currentWindow_->setActive(true);
     if (currentWindow_->windowMode == WindowMode::Tiled)
         currentWorkspace_->lastActiveTiledWindow = currentWindow_;
 }
@@ -54,7 +53,7 @@ void WindowManager::onUnmapNotify() {
         return;
 
     w->isMapped = false;
-    removeWindow(w);
+    unmanageWindow(w);
 
     if (w == currentWindow_)
         selectNewCurrentWindow();

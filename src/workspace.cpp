@@ -26,14 +26,14 @@ void Workspace::workspaceMode(WorkspaceMode workspaceMode) {
 void Workspace::hide() {
     for(WmWindow* w : floatingWindows)
         w->hide();
-    for(WmWindow* w : windows)
+    for(WmWindow* w : tiledWindows)
         w->hide();
 }
 
 void Workspace::show() {
     for(WmWindow* w : floatingWindows)
         w->show();
-    for(WmWindow* w : windows)
+    for(WmWindow* w : tiledWindows)
         w->show();
 }
 
@@ -43,14 +43,15 @@ void Workspace::addWindow(WmWindow* w) {
     w->workspace = this;
     if (workspaceMode_ == WorkspaceMode::Floating) {
         w->windowMode = WindowMode::Floating;
-        floatingWindows.push_back(w);
+        w->addToList(floatingWindows);
         wm->setCurrentWindow(w);
         sendWindowToFront(w);
     } else {
         w->windowMode = WindowMode::Tiled;
         addWindowToTiling(w);
-        windows.push_back(w);
+        w->addToList(tiledWindows);
         wm->setCurrentWindow(w);
+        sendWindowToBack(w);
     }
 }
 
@@ -78,8 +79,8 @@ void Workspace::addWindowToTiling(WmWindow* w) {
 
     if (lastActiveTiledWindow) {
         container = lastActiveTiledWindow->parent();
-    } else if (windows.size() > 0) {
-        container = windows.back()->parent();
+    } else if (tiledWindows.size() > 0) {
+        container = tiledWindows.back()->parent();
     }
 
     if (!container) {
@@ -87,8 +88,6 @@ void Workspace::addWindowToTiling(WmWindow* w) {
             rootContainer = createNewContainer();
         container = rootContainer.get();
     }
-
-    sendWindowToBack(w);
 
     container->add(w, lastActiveTiledWindow);
     container->realign();
@@ -110,10 +109,11 @@ void Workspace::sendWindowToBack(WmWindow* w) {
 void Workspace::toggleWindowMode(WmWindow* w) { // @TODO: tiled->float does not work correctly -> multiple add remove
     if (w->windowMode == WindowMode::Floating) {
         w->windowMode = WindowMode::Tiled;
-        floatingWindows.remove(w);
+        w->removeFromList();
         addWindowToTiling(w);
-        windows.push_back(w);
+        w->addToList(tiledWindows);
         lastActiveTiledWindow = w;
+        sendWindowToBack(w);
     } else {
         w->windowMode = WindowMode::Floating;
         WmContainer* container = w->parent();
@@ -123,8 +123,8 @@ void Workspace::toggleWindowMode(WmWindow* w) { // @TODO: tiled->float does not 
             if (parent)
                 parent->realign();
         }
-        windows.remove(w);
-        floatingWindows.push_back(w);
+        w->removeFromList();
+        w->addToList(floatingWindows);
         sendWindowToFront(w);
         if (lastActiveTiledWindow == w)
             lastActiveTiledWindow = 0;
@@ -156,23 +156,16 @@ WmContainer* Workspace::checkCleanContainer(WmContainer *container) {
 
 void Workspace::removeWindow(WmWindow* w) {
     if (!w) return;
-    switch (w->windowMode) {
-        case WindowMode::Floating:
-            if (floatingWindows.size() > 0)
-                floatingWindows.remove(w);
-            break;
-        case WindowMode::Tiled:
-            if (windows.size() > 0)
-                windows.remove(w);
-            if (lastActiveTiledWindow == w)
-                lastActiveTiledWindow = 0;
-            WmContainer* container = w->parent();
-            if (container)
-                container->remove(w);
-            WmContainer* toAlign = checkCleanContainer(container);
-            if (toAlign)
-                toAlign->realign();
-            break;
+    w->removeFromList();
+    if (w->windowMode == WindowMode::Tiled) {
+        if (lastActiveTiledWindow == w)
+            lastActiveTiledWindow = 0;
+        WmContainer* container = w->parent();
+        if (container)
+            container->remove(w);
+        WmContainer* toAlign = checkCleanContainer(container);
+        if (toAlign)
+            toAlign->realign();
     }
     w->workspace = 0;
     if (w == lastActiveTiledWindow)

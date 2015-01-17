@@ -11,7 +11,7 @@ void WindowManager::onMapRequest() {
     if (event_.xmaprequest.parent == root) {
         WmWindow* candidate = findWindow(event_.xmaprequest.window);
         if (!candidate) { // If unknown: add
-            addWindow(event_.xmaprequest.window);
+            manageWindow(event_.xmaprequest.window);
         } else {
             candidate->map();
         }

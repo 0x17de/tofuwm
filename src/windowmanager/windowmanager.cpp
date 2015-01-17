@@ -4,9 +4,11 @@
 #include <X11/cursorfont.h>
 #include <unistd.h>
 #include <sstream>
+#include <algorithm>
 #include <containers/wmsplitter.h>
 
 #include "windowmanager.h"
+#include "containers/wmcontainer.h"
 #include "display.h"
 
 
@@ -98,7 +100,7 @@ void WindowManager::restart() {
     stopAction_ = WmStopAction::Restart;
 }
 
-WmWindow* WindowManager::addWindow(Window window) {
+WmWindow* WindowManager::manageWindow(Window window) {
     shared_ptr<WmWindow> wPtr(make_shared<WmWindow>(this, window));
     WmWindow* w = wPtr.get();
     windows_.insert(make_pair(w->window, wPtr));
@@ -134,10 +136,10 @@ void WindowManager::removeDestroyedWindow(Window w) {
         return;
 
     destroyedWindow->isMapped = false;
-    removeWindow(destroyedWindow);
+    unmanageWindow(destroyedWindow);
 }
 
-void WindowManager::removeWindow(WmWindow* w) {
+void WindowManager::unmanageWindow(WmWindow *w) {
     if (w == currentWorkspace_->lastActiveTiledWindow)
         currentWorkspace_->lastActiveTiledWindow = 0; // @TODO: Select next best tiled window
 
@@ -196,6 +198,50 @@ void WindowManager::changeWorkspace(int number) {
     // @TODO: update _NET_CURRENT_DESKTOP, _NET_NUMBER_OF_DESKTOPS
 }
 
+void WindowManager::changeWindowSelection(WmDirection direction) {
+    if (!currentWindow_) return;
+
+    WmWindow* nextWindow = 0;
+    switch (currentWindow_->windowMode) {
+        case WindowMode::Floating: {
+            auto& floatingWindows = currentWorkspace_->floatingWindows;
+            if (!currentWindow_->list)
+                break;
+            auto it = currentWindow_->it;
+            ++it;
+            if (it == floatingWindows.end())
+                it = floatingWindows.begin();
+            nextWindow = *it;
+            break;
+        }
+        case WindowMode::Tiled: {
+            WmContainer *parent = currentWindow_->parent();
+            if (!parent) break;
+            // parent->children();
+            break;
+        }
+    }
+
+    if (!nextWindow) return;
+    setCurrentWindow(nextWindow);
+}
+
+void WindowManager::moveWindow(WmDirection direction) {
+    if (!currentWindow_) return;
+
+    switch (currentWindow_->windowMode) {
+        case WindowMode::Floating:
+            // @TODO: moveWindow, floating
+            break;
+        case WindowMode::Tiled:
+            // @TODO: moveWindow, tiled
+            WmContainer* parent = currentWindow_->parent();
+            if (!parent) break;
+            // parent->children();
+            break;
+    }
+}
+
 void WindowManager::calculateDesktopSpace() {
     XWindowAttributes rAttr;
     XGetWindowAttributes(display, root, &rAttr);
@@ -243,8 +289,8 @@ Atom WindowManager::getAtom(const std::string& protocol) {
 }
 
 void WindowManager::selectNewCurrentWindow() {
-    if (currentWorkspace_->windows.size() > 0)
-        setCurrentWindow(currentWorkspace_->windows.front());
+    if (currentWorkspace_->tiledWindows.size() > 0)
+        setCurrentWindow(currentWorkspace_->tiledWindows.front());
     else
         setCurrentWindow(nullptr);
 }

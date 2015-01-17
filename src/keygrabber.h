@@ -19,6 +19,7 @@ public:
     ~KeyGrabber();
 
     unsigned int key(const std::string &character);
+    unsigned int key(int keysym);
 };
 
 #endif // KEYGRABBER_H

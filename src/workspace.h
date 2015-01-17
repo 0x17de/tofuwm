@@ -26,7 +26,7 @@ class Workspace {
 public:
 
     std::list<WmWindow*> floatingWindows;
-    std::list<WmWindow*> windows;
+    std::list<WmWindow*> tiledWindows;
     WmWindow* lastActiveTiledWindow = 0;
     std::shared_ptr<WmContainer> rootContainer;
     std::list<std::shared_ptr<WmContainer>> containers;

@@ -86,7 +86,7 @@ void WindowManager::addExistingWindows() throw() {
         return;
 
     for (int i = 0; i < numberOfChildren; ++i) {
-        WmWindow* w = addWindow(children[i]);
+        WmWindow* w = manageWindow(children[i]);
         currentWorkspace_->addWindow(w);
     }
 

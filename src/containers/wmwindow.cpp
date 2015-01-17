@@ -24,11 +24,28 @@ WmWindow::WmWindow(WindowManager* wm, Window window) :
 }
 
 WmWindow::~WmWindow() {
+    if (workspace)
+        workspace->removeWindow(this);
+
     XWindowAttributes wAttr;
     XGetWindowAttributes(wm->display, frame, &wAttr);
     if (window && isMapped)
         XReparentWindow(wm->display, window, wm->root, wAttr.x, wAttr.y);
     XDestroyWindow(wm->display, frame);
+}
+
+void WmWindow::addToList(std::list<WmWindow*>& newList) {
+    if (list) removeFromList();
+    list = &newList;
+    newList.push_back(this);
+    it = --newList.end();
+}
+
+void WmWindow::removeFromList() {
+    if (list) {
+        list->erase(it);
+        list = nullptr;
+    }
 }
 
 void WmWindow::onPropertyChange(Atom atom, int state) {

@@ -23,6 +23,9 @@ enum class LogLevel {
     VeryVerbose = 5
 };
 
+enum class WmDirection {
+    Up, Right, Down, Left
+};
 
 enum class WmStopAction {
     Stop,
@@ -90,9 +93,9 @@ private:
     void loop();
     void calculateDesktopSpace();
     void spawn(const std::string& cmd, char *const argv[]);
-    WmWindow* addWindow(Window window);
+    WmWindow*manageWindow(Window window);
     void removeDestroyedWindow(Window window);
-    void removeWindow(WmWindow* window);
+    void unmanageWindow(WmWindow *window);
     WmWindow* findWindow(Window window);
     void selectNewCurrentWindow();
     void changeSplitterDirectionOfWindow(WmWindow* window);
@@ -100,6 +103,9 @@ private:
 public:
     void setCurrentWindow(Window window);
     void setCurrentWindow(WmWindow* window);
+
+    void changeWindowSelection(WmDirection direction);
+    void moveWindow(WmDirection direction);
 private:
 
 public:

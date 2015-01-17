@@ -15,6 +15,9 @@ class WindowManager;
 class Workspace;
 class WmWindow : public WmFrame {
 public:
+    std::list<WmWindow*>* list = 0;
+    std::list<WmWindow*>::iterator it;
+
     WindowManager* wm;
     Window window;
     Window frame;
@@ -33,6 +36,8 @@ public:
     void show();
     void hide();
     void map();
+    void addToList(std::list<WmWindow*>& list);
+    void removeFromList();
     int minWindowSize();
     void setActive(bool active);
     bool supportsProtocol(Atom protocol) throw ();

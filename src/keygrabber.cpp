@@ -28,6 +28,49 @@ workspaceCount(workspaceCount)
             [=] { wm->onMouseRelease(); },
             [=] { wm->onMouseMotion(); });
 
+    // Select windows
+    hotkeys.emplace_back(wm->display, wm->root,
+            key("XK_Up"), defaultModifier,
+            [=] {
+                wm->changeWindowSelection(WmDirection::Up);
+            }, nullptr);
+    hotkeys.emplace_back(wm->display, wm->root,
+            key("XK_Right"), defaultModifier,
+            [=] {
+                wm->changeWindowSelection(WmDirection::Right);
+            }, nullptr);
+    hotkeys.emplace_back(wm->display, wm->root,
+            key("XK_Down"), defaultModifier,
+            [=] {
+                wm->changeWindowSelection(WmDirection::Down);
+            }, nullptr);
+    hotkeys.emplace_back(wm->display, wm->root,
+            key("XK_Left"), defaultModifier,
+            [=] {
+                wm->changeWindowSelection(WmDirection::Left);
+            }, nullptr);
+    // Swap tiled windows
+    hotkeys.emplace_back(wm->display, wm->root,
+            key("XK_Up"), defaultModifier|ShiftMask,
+            [=] {
+                wm->moveWindow(WmDirection::Up);
+            }, nullptr);
+    hotkeys.emplace_back(wm->display, wm->root,
+            key("XK_Right"), defaultModifier|ShiftMask,
+            [=] {
+                wm->moveWindow(WmDirection::Right);
+            }, nullptr);
+    hotkeys.emplace_back(wm->display, wm->root,
+            key("XK_Down"), defaultModifier|ShiftMask,
+            [=] {
+                wm->moveWindow(WmDirection::Down);
+            }, nullptr);
+    hotkeys.emplace_back(wm->display, wm->root,
+            key("XK_Left"), defaultModifier|ShiftMask,
+            [=] {
+                wm->moveWindow(WmDirection::Left);
+            }, nullptr);
+
     // Restart window manager
     hotkeys.emplace_back(wm->display, wm->root,
             key("r"), defaultModifier|ShiftMask,
@@ -99,4 +142,8 @@ KeyGrabber::~KeyGrabber() {
 
 unsigned int KeyGrabber::key(const std::string& character) {
     return XKeysymToKeycode(wm->display, XStringToKeysym(character.c_str()));
+}
+
+unsigned int KeyGrabber::key(int keysym) {
+    return XKeysymToKeycode(wm->display, keysym);
 }
