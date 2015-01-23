@@ -54,7 +54,7 @@ void WindowManager::changeSplitterDirectionOfWindow(WmWindow *window) {
         if (!parent)
             return;
 
-        switch (parent->containerType()) {
+        switch (parent->frameType()) {
             case WmFrameType::Splitter: {
                 WmSplitter *splitter = (WmSplitter *) parent;
 
@@ -198,16 +198,17 @@ void WindowManager::changeWorkspace(int number) {
     // @TODO: update _NET_CURRENT_DESKTOP, _NET_NUMBER_OF_DESKTOPS
 }
 
-void WindowManager::changeWindowSelection(WmDirection direction) {
-    if (!currentWindow_) return;
+void WindowManager::changeWindowSelection(WmWindow* window, WmDirection direction) {
+    if (!window) return;
 
     WmWindow* nextWindow = 0;
-    switch (currentWindow_->windowMode) {
+    switch (window->windowMode) {
         case WindowMode::Floating: {
+            // select next left/up being window by x/y, when same x/y select next in windowstack
             auto& floatingWindows = currentWorkspace_->floatingWindows;
-            if (!currentWindow_->list)
+            if (!window->workspaceWindowList)
                 break;
-            auto it = currentWindow_->it;
+            auto it = window->workspaceWindowListIterator;
             ++it;
             if (it == floatingWindows.end())
                 it = floatingWindows.begin();
@@ -215,7 +216,7 @@ void WindowManager::changeWindowSelection(WmDirection direction) {
             break;
         }
         case WindowMode::Tiled: {
-            WmContainer *parent = currentWindow_->parent();
+            WmContainer *parent = window->parent();
             if (!parent) break;
             // parent->children();
             break;
@@ -226,18 +227,64 @@ void WindowManager::changeWindowSelection(WmDirection direction) {
     setCurrentWindow(nextWindow);
 }
 
-void WindowManager::moveWindow(WmDirection direction) {
-    if (!currentWindow_) return;
+std::list<WmFrame*>::iterator WindowManager::findMovementCandidateIterator(WmWindow* window, WmDirection direction) {
+    bool horizontalMovement = direction == WmDirection::Left || direction == WmDirection::Right;
+    bool moveToLowerIndex = direction == WmDirection::Left || direction == WmDirection::Up;
 
-    switch (currentWindow_->windowMode) {
+    WmFrame* lastElement = window;
+    WmContainer* container = window->parent();
+    while (container) {
+        if (container->children().size() != 1) {
+            // is valid for movement direction? otherwise pop out later
+            bool sameDirection = false;
+            switch (container->frameType()) {
+                case WmFrameType::Splitter:
+                    sameDirection = horizontalMovement && container->as<WmSplitter>()->splitterType() == WmSplitterType::Horizontal;
+                    break;
+                case WmFrameType::Frame:
+                case WmFrameType::Window:
+                    break; // Not a valid container type, try to proceed
+            }
+            if (sameDirection) {
+                // if not first element, this is a valid candidate
+                if (moveToLowerIndex) {
+                    if (container->children().front() != lastElement)
+                        break; // Ok.
+                } else {
+                    if (container->children().back() != lastElement)
+                        break; // Ok.
+                }
+            }
+        }
+        lastElement = container;
+        container = container->parent();
+    }
+    if (!container)
+        return list<WmFrame*>::iterator();
+
+    return find(begin(container->children()), end(container->children()), lastElement); // Can be null for root container
+}
+
+void WindowManager::moveWindow(WmWindow* window, WmDirection direction) {
+    if (!window) return;
+
+    bool horizontalMovement = direction == WmDirection::Left || direction == WmDirection::Right;
+    bool moveToLowerIndex = direction == WmDirection::Left || direction == WmDirection::Up;
+
+    switch (window->windowMode) {
         case WindowMode::Floating:
             // @TODO: moveWindow, floating
+            // currentWindow_->relocate(<#(int)x#>, <#(int)y#>, <#(int)w#>, <#(int)h#>)
             break;
         case WindowMode::Tiled:
             // @TODO: moveWindow, tiled
-            WmContainer* parent = currentWindow_->parent();
-            if (!parent) break;
-            // parent->children();
+            std::list<WmFrame*>::iterator whereToMove = findMovementCandidateIterator(window, direction);
+            if (whereToMove != list<WmFrame*>::iterator()) { // Found.
+                if (!moveToLowerIndex)
+                    ++whereToMove;
+
+                // @TODO: move window here
+            }
             break;
     }
 }

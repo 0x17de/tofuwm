@@ -23,7 +23,7 @@ public:
 
     void relocate(int x, int y, int width, int height) override;
 
-    virtual WmFrameType containerType();
+    virtual WmFrameType frameType();
 };
 
 

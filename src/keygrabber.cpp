@@ -32,43 +32,43 @@ workspaceCount(workspaceCount)
     hotkeys.emplace_back(wm->display, wm->root,
             key("XK_Up"), defaultModifier,
             [=] {
-                wm->changeWindowSelection(WmDirection::Up);
+                wm->changeWindowSelection(wm->currentWindow_, WmDirection::Up);
             }, nullptr);
     hotkeys.emplace_back(wm->display, wm->root,
             key("XK_Right"), defaultModifier,
             [=] {
-                wm->changeWindowSelection(WmDirection::Right);
+                wm->changeWindowSelection(wm->currentWindow_, WmDirection::Right);
             }, nullptr);
     hotkeys.emplace_back(wm->display, wm->root,
             key("XK_Down"), defaultModifier,
             [=] {
-                wm->changeWindowSelection(WmDirection::Down);
+                wm->changeWindowSelection(wm->currentWindow_, WmDirection::Down);
             }, nullptr);
     hotkeys.emplace_back(wm->display, wm->root,
             key("XK_Left"), defaultModifier,
             [=] {
-                wm->changeWindowSelection(WmDirection::Left);
+                wm->changeWindowSelection(wm->currentWindow_, WmDirection::Left);
             }, nullptr);
     // Swap tiled windows
     hotkeys.emplace_back(wm->display, wm->root,
             key("XK_Up"), defaultModifier|ShiftMask,
             [=] {
-                wm->moveWindow(WmDirection::Up);
+                wm->moveWindow(wm->currentWindow_, WmDirection::Up);
             }, nullptr);
     hotkeys.emplace_back(wm->display, wm->root,
             key("XK_Right"), defaultModifier|ShiftMask,
             [=] {
-                wm->moveWindow(WmDirection::Right);
+                wm->moveWindow(wm->currentWindow_, WmDirection::Right);
             }, nullptr);
     hotkeys.emplace_back(wm->display, wm->root,
             key("XK_Down"), defaultModifier|ShiftMask,
             [=] {
-                wm->moveWindow(WmDirection::Down);
+                wm->moveWindow(wm->currentWindow_, WmDirection::Down);
             }, nullptr);
     hotkeys.emplace_back(wm->display, wm->root,
             key("XK_Left"), defaultModifier|ShiftMask,
             [=] {
-                wm->moveWindow(WmDirection::Left);
+                wm->moveWindow(wm->currentWindow_, WmDirection::Left);
             }, nullptr);
 
     // Restart window manager

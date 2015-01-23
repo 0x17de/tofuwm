@@ -21,7 +21,10 @@ public:
     WmFrame();
     virtual ~WmFrame();
 
-    virtual WmFrameType containerType() = 0;
+    template<class T>
+    T* as() { return (T*)this; }
+
+    virtual WmFrameType frameType() = 0;
     virtual void realign();
     virtual void relocate(int x, int y, int width, int height) = 0;
 

@@ -104,8 +104,11 @@ public:
     void setCurrentWindow(Window window);
     void setCurrentWindow(WmWindow* window);
 
-    void changeWindowSelection(WmDirection direction);
-    void moveWindow(WmDirection direction);
+private:
+    std::list<WmFrame*>::iterator findMovementCandidateIterator(WmWindow* window, WmDirection direction);
+public:
+    void changeWindowSelection(WmWindow* window, WmDirection direction);
+    void moveWindow(WmWindow* window, WmDirection direction);
 private:
 
 public:

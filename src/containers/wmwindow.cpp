@@ -35,16 +35,16 @@ WmWindow::~WmWindow() {
 }
 
 void WmWindow::addToList(std::list<WmWindow*>& newList) {
-    if (list) removeFromList();
-    list = &newList;
+    if (workspaceWindowList) removeFromList();
+    workspaceWindowList = &newList;
     newList.push_back(this);
-    it = --newList.end();
+    workspaceWindowListIterator = --newList.end();
 }
 
 void WmWindow::removeFromList() {
-    if (list) {
-        list->erase(it);
-        list = nullptr;
+    if (workspaceWindowList) {
+        workspaceWindowList->erase(workspaceWindowListIterator);
+        workspaceWindowList = nullptr;
     }
 }
 
@@ -100,7 +100,7 @@ void WmWindow::setSubstructureEvents(bool enable) {
         XChangeWindowAttributes(wm->display, frame, CWEventMask | CWOverrideRedirect, &attributes);
 };
 
-WmFrameType WmWindow::containerType() {
+WmFrameType WmWindow::frameType() {
     return WmFrameType::Window;
 }
 

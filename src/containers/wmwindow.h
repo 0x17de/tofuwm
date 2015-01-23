@@ -15,8 +15,8 @@ class WindowManager;
 class Workspace;
 class WmWindow : public WmFrame {
 public:
-    std::list<WmWindow*>* list = 0;
-    std::list<WmWindow*>::iterator it;
+    std::list<WmWindow*>* workspaceWindowList = 0;
+    std::list<WmWindow*>::iterator workspaceWindowListIterator;
 
     WindowManager* wm;
     Window window;
@@ -28,7 +28,7 @@ public:
     WmWindow(WindowManager* wm, Window window);
     virtual ~WmWindow();
 
-    virtual WmFrameType containerType();
+    virtual WmFrameType frameType() override;
 
     void loadWindowProperties();
     void onPropertyChange(Atom atom, int state);

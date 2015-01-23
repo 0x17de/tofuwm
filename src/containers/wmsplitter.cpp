@@ -9,7 +9,7 @@ splitterType_(splitterType)
 WmSplitter::~WmSplitter() {
 }
 
-WmFrameType WmSplitter::containerType() {
+WmFrameType WmSplitter::frameType() {
     return WmFrameType::Splitter;
 }
 

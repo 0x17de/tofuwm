@@ -25,7 +25,7 @@ public:
     void add(WmFrame* frame, WmFrame* after = 0);
     void remove(WmFrame* frame);
     virtual void relocate(int x, int y, int width, int height) = 0;
-    virtual WmFrameType containerType() = 0;
+    virtual WmFrameType frameType() = 0;
 };
 
 
